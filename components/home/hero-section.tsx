@@ -62,15 +62,15 @@ export function HeroSection() {
             <dl className="mt-10 grid w-full max-w-lg grid-cols-3 gap-4 border-t border-border pt-6">
               <div>
                 <dt className="text-xs text-muted-foreground">Symptom consultations</dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight">{stats.symptomConsultations}</dd>
+                <dd className="mt-2 h-10 text-2xl font-semibold tracking-tight tabular-nums">{stats.symptomConsultations}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Drug types</dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight">{stats.drugTypes}</dd>
+                <dd className="mt-2 h-10 text-2xl font-semibold tracking-tight tabular-nums">{stats.drugTypes}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Breeds covered</dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight">{stats.breedsCovered}</dd>
+                <dd className="mt-2 h-10 text-2xl font-semibold tracking-tight tabular-nums">{stats.breedsCovered}</dd>
               </div>
             </dl>
           </div>
