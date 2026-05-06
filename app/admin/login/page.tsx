@@ -113,12 +113,6 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <div className="mt-6 rounded-lg border border-dashed bg-muted/30 p-3 text-xs text-muted-foreground">
-            <p className="font-medium text-foreground">演示账号</p>
-            <p className="mt-1 font-mono">admin@dogisok.net</p>
-            <p className="font-mono">Admin@2026</p>
-          </div>
-
           <p className="mt-6 text-center text-xs text-muted-foreground">
             普通用户？{" "}
             <Link href="/login" className="font-medium text-primary hover:underline">
