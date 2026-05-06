@@ -141,11 +141,11 @@ export function LoginForm() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           By continuing you agree to our{" "}
-          <Link href="/terms" className="underline underline-offset-2">
+          <Link href="/terms" className="underline underline-offset-2 hover:text-foreground">
             Terms
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="underline underline-offset-2">
+          <Link href="/privacy-policy" className="underline underline-offset-2 hover:text-foreground">
             Privacy Policy
           </Link>
           .
