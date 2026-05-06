@@ -1,5 +1,6 @@
 import { generateText } from "ai"
-import { DISEASE_CHECK_SYSTEM_PROMPT, DEFAULT_AI_MODEL } from "@/lib/ai-prompts"
+import { DEFAULT_AI_MODEL } from "@/lib/ai-prompts"
+import { getAiConfigByScenario } from "@/lib/ai-config"
 import { createClient } from "@/lib/supabase/server"
 
 export const maxDuration = 60
@@ -97,9 +98,12 @@ export async function POST(req: Request) {
       .filter((line) => line !== null)
       .join("\n")
 
+    // 从数据库获取疾病自查配置
+    const diseaseCheckConfig = await getAiConfigByScenario("disease-check")
+    
     const result = await generateText({
       model: DEFAULT_AI_MODEL,
-      system: DISEASE_CHECK_SYSTEM_PROMPT,
+      system: diseaseCheckConfig.system_prompt,
       prompt,
       abortSignal: req.signal,
     })

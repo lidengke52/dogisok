@@ -2,13 +2,22 @@ import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { isAdmin } from "@/lib/admin"
-import { AiConfigForm } from "@/components/admin/ai-config-form-v2"
+import { AiConfigPageClient } from "@/components/admin/ai-config-page-client"
 
 export const dynamic = "force-dynamic"
 
 export const metadata = {
-  title: "Dr.Max AI 配置",
-  description: "配置 DeepSeek API 和系统提示词",
+  title: "AI 模型配置管理",
+  description: "配置不同场景的 AI 模型、API 和系统提示词",
+}
+
+interface ConfigData {
+  id: string
+  api_url: string
+  api_key: string
+  model: string
+  system_prompt: string
+  scenario_type: string
 }
 
 export default async function AIConfigPage() {
@@ -25,36 +34,20 @@ export default async function AIConfigPage() {
     redirect("/")
   }
 
-  // 获取当前配置（使用 service role 绕过 RLS）
-  let currentConfig = null
+  // 获取所有场景的配置
+  let configs: Record<string, ConfigData> = {}
   try {
     const adminClient = createAdminClient()
-    const { data } = await adminClient.from("ai_config").select("*").eq("id", "default").maybeSingle()
-    currentConfig = data
+    const { data } = await adminClient.from("ai_config").select("*")
+
+    if (data) {
+      for (const config of data) {
+        configs[config.scenario_type] = config
+      }
+    }
   } catch (error) {
-    console.error("[Dr.Max] Error fetching config:", error)
+    console.error("[AI Config] Error fetching configs:", error)
   }
 
-  return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dr.Max AI 配置</h1>
-        <p className="text-muted-foreground mt-2">配置 DeepSeek API、模型和系统提示词</p>
-      </div>
-
-      <AiConfigForm
-        initialConfig={
-          currentConfig
-            ? {
-                api_url: currentConfig.api_url,
-                api_key: currentConfig.api_key,
-                model: currentConfig.model,
-                system_prompt: currentConfig.system_prompt,
-              }
-            : undefined
-        }
-      />
-    </div>
-  )
+  return <AiConfigPageClient initialConfigs={configs} />
 }
-

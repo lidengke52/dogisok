@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { api_url, api_key, model, system_prompt } = body
+    const { api_url, api_key, model, system_prompt, scenario = "dr-max" } = body
 
     if (!api_url || !model || !system_prompt) {
       return NextResponse.json(
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       const { data: existing } = await adminClient
         .from("ai_config")
         .select("api_key")
-        .eq("id", "default")
+        .eq("scenario_type", scenario)
         .maybeSingle()
       finalApiKey = existing?.api_key || ""
     }
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       .from("ai_config")
       .upsert(
         {
-          id: "default",
+          scenario_type: scenario,
           api_url,
           api_key: finalApiKey,
           model,
@@ -92,13 +92,13 @@ export async function POST(request: NextRequest) {
           is_active: true,
           updated_at: new Date().toISOString(),
         },
-        { onConflict: "id" }
+        { onConflict: "scenario_type" }
       )
       .select()
       .single()
 
     if (error) {
-      console.error("[Dr.Max] Upsert error:", error)
+      console.error("[AI Config] Upsert error:", error)
       throw error
     }
 
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: "配置已保存成功", config: data })
   } catch (error) {
-    console.error("[Dr.Max] Error saving AI config:", error)
+    console.error("[AI Config] Error saving AI config:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "保存配置失败" },
       { status: 500 }
