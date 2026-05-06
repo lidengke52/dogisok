@@ -1,5 +1,6 @@
+import { createOpenAI } from "@ai-sdk/openai"
 import { generateText } from "ai"
-import { DISEASE_CHECK_SYSTEM_PROMPT, DEFAULT_AI_MODEL } from "@/lib/ai-prompts"
+import { getAiConfigByScenario } from "@/lib/ai-config"
 import { createClient } from "@/lib/supabase/server"
 
 export const maxDuration = 60
@@ -97,9 +98,29 @@ export async function POST(req: Request) {
       .filter((line) => line !== null)
       .join("\n")
 
+    // 从数据库获取疾病自查配置
+    const diseaseCheckConfig = await getAiConfigByScenario("disease-check")
+    
+    if (!diseaseCheckConfig.api_key) {
+      console.error("[disease-check] error: API Key not configured")
+      return Response.json({ error: GENERIC_ERROR }, { status: 500 })
+    }
+    
+    // 创建自定义 API 客户端（按 OpenAI 兼容模式）
+    const baseURL = (diseaseCheckConfig.api_url || "https://api.deepseek.com/chat/completions").replace(
+      /\/chat\/completions\/?$/,
+      "",
+    )
+    
+    const provider = createOpenAI({
+      baseURL,
+      apiKey: diseaseCheckConfig.api_key,
+      compatibility: "compatible",
+    })
+    
     const result = await generateText({
-      model: DEFAULT_AI_MODEL,
-      system: DISEASE_CHECK_SYSTEM_PROMPT,
+      model: provider.chat(diseaseCheckConfig.model),
+      system: diseaseCheckConfig.system_prompt,
       prompt,
       abortSignal: req.signal,
     })

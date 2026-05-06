@@ -27,20 +27,20 @@ FORMAT
 - Keep each response under 400 words unless the user asks for more detail.`,
 }
 
-export async function getOrInitializeAiConfig() {
+// 获取指定场景的配置
+export async function getAiConfigByScenario(scenario: string = "dr-max") {
   try {
-    // Try to fetch from database first
     const adminClient = createAdminClient()
 
     const { data, error } = await adminClient
       .from("ai_config")
       .select("*")
-      .eq("id", "default")
+      .eq("scenario_type", scenario)
       .maybeSingle()
 
     // If there's an error accessing the table, fall back to default config
     if (error) {
-      console.log("[Dr.Max] Using default config - table may not exist yet:", error.message)
+      console.log(`[AI Config] Using default config for scenario "${scenario}" - table may not exist yet:`, error.message)
       return DEEPSEEK_DEFAULT_CONFIG
     }
 
@@ -50,12 +50,18 @@ export async function getOrInitializeAiConfig() {
     }
 
     // If no data but table exists, return default
+    console.log(`[AI Config] No config found for scenario "${scenario}", using default`)
     return DEEPSEEK_DEFAULT_CONFIG
   } catch (error) {
-    console.error("[Dr.Max] Error getting AI config:", error)
+    console.error(`[AI Config] Error getting AI config for scenario "${scenario}":`, error)
     // Always return default config as fallback
     return DEEPSEEK_DEFAULT_CONFIG
   }
+}
+
+// 向后兼容：获取 Dr. Max 配置
+export async function getOrInitializeAiConfig() {
+  return getAiConfigByScenario("dr-max")
 }
 
 export async function updateAiConfig(config: {
@@ -63,21 +69,21 @@ export async function updateAiConfig(config: {
   api_key?: string
   model?: string
   system_prompt?: string
-}) {
+}, scenario: string = "dr-max") {
   try {
     const adminClient = createAdminClient()
 
     const { data, error } = await adminClient
       .from("ai_config")
       .update(config)
-      .eq("id", "default")
+      .eq("scenario_type", scenario)
       .select()
       .single()
 
     if (error) throw error
     return data
   } catch (error) {
-    console.error("[Dr.Max] Error updating AI config:", error)
+    console.error(`[AI Config] Error updating AI config for scenario "${scenario}":`, error)
     throw error
   }
 }

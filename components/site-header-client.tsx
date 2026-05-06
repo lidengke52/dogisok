@@ -13,6 +13,7 @@ const navigation = [
   { name: "Self-Check", href: "/disease-check" },
   { name: "Medications", href: "/medication-check" },
   { name: "Dr. Max", href: "/consultation" },
+  { name: "About", href: "/about" },
 ]
 
 export function HeaderClient({ isAuthed, email }: { isAuthed: boolean; email: string | null }) {

@@ -70,7 +70,10 @@ const NAV_GROUPS: NavGroup[] = [
   },
   {
     title: "系统设置",
-    items: [{ href: "/admin/ai-config", label: "Dr.Max AI 配置", icon: Sparkles }],
+    items: [
+      { href: "/admin/ai-config/dr-max", label: "Dr.Max AI 配置", icon: Sparkles },
+      { href: "/admin/ai-config/disease-check", label: "疾病自查 AI 配置", icon: ShieldAlert },
+    ],
   },
 ]
 

@@ -9,6 +9,7 @@ import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
 import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react"
 
 interface AiConfigFormProps {
+  scenario?: string
   initialConfig?: {
     api_url: string
     api_key: string
@@ -17,7 +18,7 @@ interface AiConfigFormProps {
   }
 }
 
-export function AiConfigForm({ initialConfig }: AiConfigFormProps) {
+export function AiConfigForm({ scenario = "dr-max", initialConfig }: AiConfigFormProps) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
   const [testStatus, setTestStatus] = useState<"idle" | "testing" | "success" | "error">("idle")
@@ -75,7 +76,10 @@ export function AiConfigForm({ initialConfig }: AiConfigFormProps) {
         const response = await fetch("/api/admin/ai-config", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            scenario,
+          }),
         })
 
         if (!response.ok) {
