@@ -2,8 +2,11 @@ import Image from "next/image"
 import Link from "next/link"
 import { Search, Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { getFormattedStatistics } from "@/lib/format-numbers"
 
 export function HeroSection() {
+  const stats = getFormattedStatistics()
+
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
@@ -59,15 +62,15 @@ export function HeroSection() {
             <dl className="mt-10 grid w-full max-w-lg grid-cols-3 gap-4 border-t border-border pt-6">
               <div>
                 <dt className="text-xs text-muted-foreground">Symptom consultations</dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight">30,000,000+</dd>
+                <dd className="mt-1 text-2xl font-semibold tracking-tight">{stats.symptomConsultations}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Drug types</dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight">1,700+</dd>
+                <dd className="mt-1 text-2xl font-semibold tracking-tight">{stats.drugTypes}</dd>
               </div>
               <div>
                 <dt className="text-xs text-muted-foreground">Breeds covered</dt>
-                <dd className="mt-1 text-2xl font-semibold tracking-tight">100+</dd>
+                <dd className="mt-1 text-2xl font-semibold tracking-tight">{stats.breedsCovered}</dd>
               </div>
             </dl>
           </div>
