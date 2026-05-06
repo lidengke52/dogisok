@@ -60,17 +60,17 @@ export function HeroSection() {
             </div>
 
             <dl className="mt-10 grid w-full max-w-lg grid-cols-3 gap-4 border-t border-border pt-6">
-              <div>
+              <div className="flex flex-col">
                 <dt className="text-xs text-muted-foreground">Symptom consultations</dt>
-                <dd className="mt-2 h-10 text-2xl font-semibold tracking-tight tabular-nums">{stats.symptomConsultations}</dd>
+                <dd className="mt-auto text-2xl font-semibold tracking-tight tabular-nums">{stats.symptomConsultations}</dd>
               </div>
-              <div>
+              <div className="flex flex-col">
                 <dt className="text-xs text-muted-foreground">Drug types</dt>
-                <dd className="mt-2 h-10 text-2xl font-semibold tracking-tight tabular-nums">{stats.drugTypes}</dd>
+                <dd className="mt-auto text-2xl font-semibold tracking-tight tabular-nums">{stats.drugTypes}</dd>
               </div>
-              <div>
+              <div className="flex flex-col">
                 <dt className="text-xs text-muted-foreground">Breeds covered</dt>
-                <dd className="mt-2 h-10 text-2xl font-semibold tracking-tight tabular-nums">{stats.breedsCovered}</dd>
+                <dd className="mt-auto text-2xl font-semibold tracking-tight tabular-nums">{stats.breedsCovered}</dd>
               </div>
             </dl>
           </div>
