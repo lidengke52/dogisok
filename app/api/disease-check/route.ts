@@ -1,5 +1,5 @@
+import { openai } from "@ai-sdk/openai"
 import { generateText } from "ai"
-import { DEFAULT_AI_MODEL } from "@/lib/ai-prompts"
 import { getAiConfigByScenario } from "@/lib/ai-config"
 import { createClient } from "@/lib/supabase/server"
 
@@ -101,8 +101,19 @@ export async function POST(req: Request) {
     // 从数据库获取疾病自查配置
     const diseaseCheckConfig = await getAiConfigByScenario("disease-check")
     
+    if (!diseaseCheckConfig.api_key) {
+      console.error("[disease-check] error: API Key not configured")
+      return Response.json({ error: GENERIC_ERROR }, { status: 500 })
+    }
+    
+    // 创建自定义 API 客户端（类似 Dr. Max）
+    const client = openai({
+      apiKey: diseaseCheckConfig.api_key,
+      baseURL: diseaseCheckConfig.api_url.replace("/chat/completions", ""),
+    })
+    
     const result = await generateText({
-      model: DEFAULT_AI_MODEL,
+      model: client(diseaseCheckConfig.model),
       system: diseaseCheckConfig.system_prompt,
       prompt,
       abortSignal: req.signal,
