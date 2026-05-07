@@ -76,7 +76,7 @@ export function BreedsGrid({ breeds }: BreedsGridProps) {
               <div className="mt-5 flex items-center justify-between text-xs text-muted-foreground">
                 <span>{breed.lifespan}</span>
                 <span className="inline-flex items-center gap-1 font-medium text-primary">
-                  了解更多
+                  Read more
                   <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </span>
               </div>
