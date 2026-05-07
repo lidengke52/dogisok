@@ -22,21 +22,21 @@ export function BreedsTable({ breeds }: { breeds: Breed[] }) {
           <EmptyMedia variant="icon">
             <Dog className="h-6 w-6" />
           </EmptyMedia>
-          <EmptyTitle>No breeds</EmptyTitle>
-          <EmptyDescription>Click "Add Breed" in the top right to get started.</EmptyDescription>
+          <EmptyTitle>暂无品种</EmptyTitle>
+          <EmptyDescription>点击右上角"新增品种"开始添加。</EmptyDescription>
         </EmptyHeader>
       </Empty>
     )
   }
 
   function onDelete(slug: string, name: string) {
-    if (!confirm(`Confirm delete "${name}"? This action cannot be undone. Associated articles will have their reference removed (they will not be deleted).`)) return
+    if (!confirm(`确认删除"${name}"？该操作不可撤销，关联文章将解除引用（不会被删除）。`)) return
     setDeletingSlug(slug)
     startTransition(async () => {
       try {
         await deleteBreed(slug)
       } catch (e) {
-        alert(e instanceof Error ? e.message : "Delete failed")
+        alert(e instanceof Error ? e.message : "删除失败")
       } finally {
         setDeletingSlug(null)
       }
@@ -74,14 +74,14 @@ export function BreedsTable({ breeds }: { breeds: Breed[] }) {
   function onDeleteBulk() {
     const slugs = Array.from(selected)
     const count = slugs.length
-    if (!confirm(`Confirm delete ${count} selected breeds? This action cannot be undone.`)) return
+    if (!confirm(`确认删除选中的 ${count} 个品种？该操作不可撤销。`)) return
     
     startTransition(async () => {
       try {
         await deleteBreedsBulk(slugs)
         setSelected(new Set())
       } catch (e) {
-        alert(e instanceof Error ? e.message : "Delete failed")
+        alert(e instanceof Error ? e.message : "删除失败")
       }
     })
   }
@@ -90,7 +90,7 @@ export function BreedsTable({ breeds }: { breeds: Breed[] }) {
     <div className="space-y-4">
       {selected.size > 0 && (
         <div className="flex items-center justify-between rounded-lg bg-destructive/10 px-4 py-3">
-          <span className="text-sm font-medium text-destructive">{selected.size} selected</span>
+          <span className="text-sm font-medium text-destructive">已选中 {selected.size} 项</span>
           <Button
             variant="destructive"
             size="sm"
@@ -98,7 +98,7 @@ export function BreedsTable({ breeds }: { breeds: Breed[] }) {
             disabled={pending}
           >
             <Trash2 className="mr-1 h-4 w-4" />
-            Delete
+            批量删除
           </Button>
         </div>
       )}
@@ -116,12 +116,12 @@ export function BreedsTable({ breeds }: { breeds: Breed[] }) {
                   className="rounded border"
                 />
               </th>
-              <th className="px-4 py-3 font-medium">Breed</th>
-              <th className="px-4 py-3 font-medium">Group</th>
-              <th className="px-4 py-3 font-medium">Size</th>
-              <th className="px-4 py-3 font-medium">Order</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-              <th className="px-4 py-3 text-right font-medium">Actions</th>
+              <th className="px-4 py-3 font-medium">品种</th>
+              <th className="px-4 py-3 font-medium">分组</th>
+              <th className="px-4 py-3 font-medium">体型</th>
+              <th className="px-4 py-3 font-medium">顺序</th>
+              <th className="px-4 py-3 font-medium">状态</th>
+              <th className="px-4 py-3 text-right font-medium">操作</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-card">
