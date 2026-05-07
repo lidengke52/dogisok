@@ -3,6 +3,21 @@ import { put } from "@vercel/blob"
 import { createClient } from "@/lib/supabase/server"
 import { isAdmin } from "@/lib/admin"
 
+/**
+ * 图片上传 API
+ * 
+ * 当前使用：Vercel Blob (public)
+ * 
+ * 迁移到其他 CDN 时：
+ * 1. 修改 `/lib/storage.ts` 中的存储提供商
+ * 2. 在此文件中调用相应的存储服务
+ * 3. 更新环境变量配置
+ * 
+ * 例如迁移到阿里云 OSS：
+ * - 修改环境变量 NEXT_PUBLIC_STORAGE_PROVIDER=aliyun-oss
+ * - 配置 OSS 凭证
+ * - 实现 AliyunOSSStorage.uploadFile()
+ */
 export async function POST(request: NextRequest) {
   try {
     // 验证管理员权限
