@@ -145,7 +145,6 @@ export function BulkImportBreedsForm() {
         <Button
           onClick={handleImport}
           disabled={!file || isLoading}
-          loading={isLoading}
         >
           {isLoading ? '导入中...' : '导入全部'}
         </Button>
