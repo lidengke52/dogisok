@@ -1,5 +1,11 @@
 import { read, utils } from 'xlsx';
 
+/** 首字母大写：hound -> Hound */
+function capitalizeFirst(str: string): string {
+  if (!str) return ''
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
 export interface BreedRow {
   cn_name?: string;
   name?: string;
@@ -54,12 +60,13 @@ export async function parseBreedFile(file: File): Promise<BreedRow[]> {
             temperament: row[7]?.toString().trim() || '',
             care_notes: row[8]?.toString().trim() || '',
             common_health: row[9]?.toString().trim() || '',
-            group_name: row[10]?.toString().trim() || '',
-            size: row[11]?.toString().trim() || '',
-            trainability: parseInt(row[12]) || 0,
-            shedding: parseInt(row[13]) || 0,
-            exercise: parseInt(row[14]) || 0,
-            good_with_kids: row[15]?.toString().toLowerCase() === 'yes',
+            // 大小写标准化：hound -> Hound，toy -> Toy
+            group_name: capitalizeFirst(row[10]?.toString().trim() || ''),
+            size: capitalizeFirst(row[11]?.toString().trim() || ''),
+            trainability: parseInt(row[12]) || 3,
+            shedding: parseInt(row[13]) || 3,
+            exercise: parseInt(row[14]) || 3,
+            good_with_kids: /yes|true|1|是/.test(row[15]?.toString().toLowerCase() || ''),
           });
         }
 
