@@ -4,11 +4,20 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
 import { importBreedsBulk } from '@/app/admin/breeds/actions'
-import { parseBreedFile, generateSlug, parseArrayField } from '@/lib/xlsx-parser'
+
+function generateSlug(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '').replace(/-+/g, '-').replace(/^-+|-+$/g, '')
+}
+
+function parseArrayField(value: string): string[] {
+  if (!value) return []
+  return value.split(/[,;]/).map((s) => s.trim()).filter(Boolean)
+}
 
 export function BulkImportBreedsForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [file, setFile] = useState<File | null>(null)
+  const [allRows, setAllRows] = useState<any[]>([])
   const [preview, setPreview] = useState<any[]>([])
   const { toast } = useToast()
 
@@ -16,57 +25,49 @@ export function BulkImportBreedsForm() {
     const selectedFile = e.target.files?.[0]
     if (!selectedFile) return
 
-    // 先设置 file，确保按钮不会因为 file===null 而保持禁用
     setFile(selectedFile)
+    setAllRows([])
     setPreview([])
+    setIsLoading(true)
 
     try {
-      setIsLoading(true)
-      console.log("[v0] Parsing file:", selectedFile.name, selectedFile.size)
-      const rows = await parseBreedFile(selectedFile)
-      console.log("[v0] Parsed rows:", rows.length, "first row:", rows[0])
+      // 上传到服务器端解析（避免在浏览器直接引用 xlsx 包导致水合失败）
+      const form = new FormData()
+      form.append('file', selectedFile)
+      const res = await fetch('/api/breeds/parse', { method: 'POST', body: form })
+      const data = await res.json()
 
+      if (!res.ok) {
+        throw new Error(data.error || '解析失败')
+      }
+
+      const rows: any[] = data.breeds
       if (rows.length === 0) {
-        toast({
-          title: '文件为空',
-          description: '未找到有效数据行，请确认文件格式正确',
-          variant: 'destructive',
-        })
+        toast({ title: '文件为空', description: '未找到有效数据行，请确认文件格式', variant: 'destructive' })
         return
       }
-      
-      // Preview first 5 rows
-      const previewData = rows.slice(0, 5).map((row, idx) => ({
+
+      setAllRows(rows)
+      setPreview(rows.slice(0, 5).map((row, idx) => ({
         ...row,
         slug: generateSlug(row.name || row.cn_name || `breed-${idx}`),
-      }))
-      
-      setPreview(previewData)
-      toast({
-        title: '文件已加载',
-        description: `准备导入 ${rows.length} 个品种`,
-      })
+      })))
+
+      toast({ title: '文件已加载', description: `共 ${rows.length} 个品种，确认后点击导入全部` })
     } catch (err) {
-      console.error("[v0] Parse error:", err)
-      toast({
-        title: '解析失败',
-        description: err instanceof Error ? err.message : '文件解析失败',
-        variant: 'destructive',
-      })
+      toast({ title: '解析失败', description: err instanceof Error ? err.message : '文件解析失败', variant: 'destructive' })
+      setFile(null)
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleImport = async () => {
-    if (!file) return
+    if (!allRows.length) return
 
+    setIsLoading(true)
     try {
-      setIsLoading(true)
-      const rows = await parseBreedFile(file)
-      
-      // Prepare data for import
-      const breedsToImport = rows.map((row, idx) => ({
+      const breedsToImport = allRows.map((row, idx) => ({
         name: row.name || row.cn_name || `Breed ${idx}`,
         cn_name: row.cn_name || null,
         slug: generateSlug(row.name || row.cn_name || `breed-${idx}`),
@@ -89,20 +90,13 @@ export function BulkImportBreedsForm() {
       }))
 
       await importBreedsBulk(breedsToImport)
-      
-      toast({
-        title: '成功',
-        description: `成功导入 ${breedsToImport.length} 个品种`,
-      })
-      
+
+      toast({ title: '导入成功', description: `成功导入 ${breedsToImport.length} 个品种` })
       setFile(null)
+      setAllRows([])
       setPreview([])
     } catch (err) {
-      toast({
-        title: '错误',
-        description: err instanceof Error ? err.message : '导入失败',
-        variant: 'destructive',
-      })
+      toast({ title: '导入失败', description: err instanceof Error ? err.message : '导入失败', variant: 'destructive' })
     } finally {
       setIsLoading(false)
     }
@@ -111,24 +105,20 @@ export function BulkImportBreedsForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <label className="block text-sm font-medium">
-          上传 XLSX 或 CSV 文件
-        </label>
+        <label className="block text-sm font-medium">上传 XLSX 或 CSV 文件</label>
         <input
           type="file"
           accept=".xlsx,.xls,.csv"
           onChange={handleFileSelect}
           disabled={isLoading}
-          className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
         />
-        <p className="text-xs text-muted-foreground">
-          支持格式: XLSX、XLS、CSV
-        </p>
+        <p className="text-xs text-muted-foreground">支持格式: XLSX、XLS、CSV</p>
       </div>
 
       {preview.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium">预览 (前 5 行)</h3>
+          <h3 className="text-sm font-medium">预览（前 5 行，共 {allRows.length} 条）</h3>
           <div className="overflow-x-auto border rounded-lg">
             <table className="w-full text-xs">
               <thead>
@@ -142,10 +132,10 @@ export function BulkImportBreedsForm() {
               </thead>
               <tbody>
                 {preview.map((row, idx) => (
-                  <tr key={idx} className="border-b">
+                  <tr key={idx} className="border-b last:border-0">
                     <td className="px-3 py-2">{row.name}</td>
                     <td className="px-3 py-2">{row.cn_name}</td>
-                    <td className="px-3 py-2 font-mono text-xs">{row.slug}</td>
+                    <td className="px-3 py-2 font-mono">{row.slug}</td>
                     <td className="px-3 py-2">{row.group_name}</td>
                     <td className="px-3 py-2">{row.size}</td>
                   </tr>
@@ -157,21 +147,11 @@ export function BulkImportBreedsForm() {
       )}
 
       <div className="flex gap-2">
-        <Button
-          onClick={handleImport}
-          disabled={!file || isLoading}
-        >
-          {isLoading ? '导入中...' : '导入全部'}
+        <Button onClick={handleImport} disabled={!allRows.length || isLoading}>
+          {isLoading ? '处理中...' : `导入全部${allRows.length ? `（${allRows.length} 条）` : ''}`}
         </Button>
         {file && (
-          <Button
-            variant="outline"
-            onClick={() => {
-              setFile(null)
-              setPreview([])
-            }}
-            disabled={isLoading}
-          >
+          <Button variant="outline" onClick={() => { setFile(null); setAllRows([]); setPreview([]) }} disabled={isLoading}>
             清空
           </Button>
         )}
