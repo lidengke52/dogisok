@@ -32,14 +32,11 @@ export async function POST(request: NextRequest) {
     const filename = `breeds/${timestamp}-${file.name}`
 
     const blob = await put(filename, buffer, {
-      access: "private",
+      access: "public",
       contentType: file.type,
     })
 
-    // 返回代理URL而不是直接的Blob URL（这样可以在前端加载私有图片）
-    const proxyUrl = `/api/image/${blob.pathname}`
-
-    return NextResponse.json({ url: proxyUrl })
+    return NextResponse.json({ url: blob.url })
   } catch (error) {
     console.error("[v0] Image upload error:", error)
     return NextResponse.json(
