@@ -177,6 +177,84 @@ export async function deleteBreedsBulk(slugs: string[]) {
   revalidatePath("/breeds")
 }
 
+export async function importBreedsBulk(breeds: Array<{
+  cn_name?: string | null
+  name: string
+  slug: string
+  group_name?: string | null
+  origin?: string | null
+  size?: string | null
+  lifespan?: string | null
+  weight?: string | null
+  height?: string | null
+  temperament?: string[]
+  good_with_kids?: boolean
+  trainability?: number
+  shedding?: number
+  exercise?: number
+  image?: string | null
+  summary?: string | null
+  care_notes?: string[]
+  common_health?: string[]
+  is_published?: boolean
+  display_order?: number
+}>) {
+  if (!breeds.length) throw new Error("没有品种数据要导入")
+  
+  const supabase = await assertAdmin()
+  
+  // 去重 - 保留第一个slug重复的品种
+  const seen = new Set<string>()
+  const uniqueBreeds = breeds.filter((breed) => {
+    const slug = slugify(breed.slug || breed.name)
+    if (seen.has(slug)) {
+      console.warn(`[v0] 导入时发现重复的品种 slug，将跳过: ${slug} (${breed.name})`)
+      return false
+    }
+    seen.add(slug)
+    return true
+  })
+
+  console.log(`[v0] 导入品种: 总计 ${breeds.length} 条，去重后 ${uniqueBreeds.length} 条`)
+  
+  // Normalize and prepare data
+  const normalizedBreeds = uniqueBreeds.map((breed) => ({
+    slug: slugify(breed.slug || breed.name),
+    name: breed.name,
+    cn_name: breed.cn_name || null,
+    group_name: (ALLOWED_GROUPS as readonly string[]).includes(String(breed.group_name)) 
+      ? breed.group_name 
+      : "Non-Sporting",
+    origin: breed.origin || null,
+    size: (ALLOWED_SIZES as readonly string[]).includes(String(breed.size)) 
+      ? breed.size 
+      : "Medium",
+    lifespan: breed.lifespan || null,
+    weight: breed.weight || null,
+    height: breed.height || null,
+    temperament: Array.isArray(breed.temperament) ? breed.temperament : [],
+    good_with_kids: breed.good_with_kids ?? false,
+    trainability: Math.max(1, Math.min(5, breed.trainability || 3)),
+    shedding: Math.max(1, Math.min(5, breed.shedding || 3)),
+    exercise: Math.max(1, Math.min(5, breed.exercise || 3)),
+    image: breed.image || null,
+    summary: breed.summary || null,
+    care_notes: Array.isArray(breed.care_notes) ? breed.care_notes : [],
+    common_health: Array.isArray(breed.common_health) ? breed.common_health : [],
+    is_published: breed.is_published ?? true,
+    display_order: breed.display_order || 0,
+  }))
+
+  const { error } = await supabase
+    .from("breeds")
+    .upsert(normalizedBreeds, { onConflict: "slug" })
+  
+  if (error) throw new Error(error.message)
+  
+  revalidatePath("/admin/breeds")
+  revalidatePath("/breeds")
+}
+
 export async function toggleBreedPublished(slug: string, current: boolean) {
   const supabase = await assertAdmin()
   const { error } = await supabase

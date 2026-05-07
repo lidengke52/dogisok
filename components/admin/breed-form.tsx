@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ImageUploader } from "@/components/admin/image-uploader"
 import type { Breed } from "@/lib/breeds"
 import { createBreed, updateBreed, type BreedFormState } from "@/app/admin/breeds/actions"
 
@@ -23,11 +24,10 @@ const GROUPS = ["Sporting", "Herding", "Working", "Toy", "Non-Sporting", "Terrie
 const SIZES = ["Small", "Medium", "Large"]
 
 export function BreedForm({ mode, breed, slug }: Props) {
-  // 在客户端把 slug 绑定到 Server Action 上，这样父级 Server Component 只需要传基础数据，
-  // 不会跨 Server/Client 边界传递包装函数（这是不允许的）。
+  // 使用 .bind() 而不是 inline arrow function，因为 server actions 必须保持为 server function
   const actionFn =
     mode === "edit" && slug
-      ? (prev: BreedFormState, formData: FormData) => updateBreed(slug, prev, formData)
+      ? updateBreed.bind(null, slug)
       : createBreed
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
@@ -190,13 +190,8 @@ export function BreedForm({ mode, breed, slug }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="image">封面图</Label>
-              <Input
-                id="image"
-                name="image"
-                defaultValue={breed?.image ?? ""}
-                placeholder="/images/breed-xxx.jpg 或 https://..."
-              />
+              <Label>封面图</Label>
+              <ImageUploader name="image" defaultValue={breed?.image ?? ""} />
             </div>
 
             <div className="space-y-1.5">

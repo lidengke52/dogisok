@@ -81,3 +81,53 @@ export async function getMedicationById(id: string): Promise<Medication | null> 
   }
   return data as Medication | null
 }
+
+/** 后台分页查询药品（支持搜索） */
+export async function listAllMedicationsWithPagination(
+  page: number = 1,
+  pageSize: number = 20,
+  search?: string
+) {
+  const supabase = await createClient()
+
+  // 构建查询
+  let countQuery = supabase.from("medications").select("*", { count: "exact", head: true })
+  let dataQuery = supabase.from("medications").select("*")
+
+  // 如果有搜索词，过滤名称、适用宠物、用途等
+  if (search && search.trim()) {
+    const searchTerm = `%${search.trim()}%`
+    countQuery = countQuery.or(
+      `name.ilike.${searchTerm},indications.ilike.${searchTerm},applicable_pets.ilike.${searchTerm},usage_method.ilike.${searchTerm}`
+    )
+    dataQuery = dataQuery.or(
+      `name.ilike.${searchTerm},indications.ilike.${searchTerm},applicable_pets.ilike.${searchTerm},usage_method.ilike.${searchTerm}`
+    )
+  }
+
+  // 获取总数
+  const { count, error: countError } = await countQuery
+
+  if (countError) {
+    console.error("[v0] listAllMedicationsWithPagination count error:", countError)
+    return { medications: [], total: 0, page, pageSize }
+  }
+
+  // 获取数据
+  const offset = (page - 1) * pageSize
+  const { data, error } = await dataQuery
+    .order("name", { ascending: true })
+    .range(offset, offset + pageSize - 1)
+
+  if (error) {
+    console.error("[v0] listAllMedicationsWithPagination error:", error)
+    return { medications: [], total: count ?? 0, page, pageSize }
+  }
+
+  return {
+    medications: (data ?? []) as Medication[],
+    total: count ?? 0,
+    page,
+    pageSize,
+  }
+}
