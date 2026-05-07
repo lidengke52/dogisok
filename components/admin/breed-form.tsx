@@ -23,9 +23,10 @@ const GROUPS = ["Sporting", "Herding", "Working", "Toy", "Non-Sporting", "Terrie
 const SIZES = ["Small", "Medium", "Large"]
 
 export function BreedForm({ mode, breed, slug }: Props) {
+  // 使用 .bind() 而不是 inline arrow function，因为 server actions 必须保持为 server function
   const actionFn =
     mode === "edit" && slug
-      ? (prev: BreedFormState, formData: FormData) => updateBreed(slug, prev, formData)
+      ? updateBreed.bind(null, slug)
       : createBreed
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
@@ -61,7 +62,7 @@ export function BreedForm({ mode, breed, slug }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cn_name">中文名</Label>
-              <Input id="cn_name" name="cn_name" defaultValue={breed?.cn_name ?? ""} placeholder="金毛" />
+              <Input id="cn_name" name="cn_name" defaultValue={breed?.cnName ?? ""} placeholder="金毛" />
             </div>
           </div>
 
