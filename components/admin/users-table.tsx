@@ -1,9 +1,11 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { Search, MapPin, Gift, ExternalLink } from "lucide-react"
+import { Search, MapPin, Gift, ExternalLink, Shield } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { toggleUserAdmin } from "@/app/admin/users/actions"
+import { useToast } from "@/hooks/use-toast"
 
 export type AdminUserRow = {
   id: string
@@ -23,6 +25,7 @@ export type AdminUserRow = {
   country: string | null
   has_address: boolean
   created_at: string
+  is_admin: boolean
 }
 
 function formatDate(s: string) {
@@ -193,6 +196,31 @@ function FilterPill({
 function UserDetailDrawer({ row, onClose }: { row: AdminUserRow; onClose: () => void }) {
   const fullAddress =
     [row.street_address, row.city, row.state, row.postal_code, row.country].filter(Boolean).join(", ") || "—"
+  const [isUpdating, setIsUpdating] = useState(false)
+  const { toast } = useToast()
+
+  const handleToggleAdmin = async () => {
+    if (!row.email) return
+    setIsUpdating(true)
+    try {
+      const result = await toggleUserAdmin(row.email, !row.is_admin)
+      if (result.error) {
+        toast({ title: "错误", description: result.error, variant: "destructive" })
+      } else {
+        toast({ title: "成功", description: `已${row.is_admin ? "移除" : "设为"}管理员` })
+        // 重新加载页面以更新数据
+        window.location.reload()
+      }
+    } catch (err) {
+      toast({
+        title: "错误",
+        description: err instanceof Error ? err.message : "操作失败",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUpdating(false)
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-label="用户详情">
@@ -227,6 +255,26 @@ function UserDetailDrawer({ row, onClose }: { row: AdminUserRow; onClose: () => 
             />
             <Field label="他邀请的人数" value={String(row.invites_count)} />
             <Field label="注册时间" value={formatDate(row.created_at)} />
+          </Section>
+
+          <Section title="权限">
+            <div className="space-y-2">
+              {row.is_admin && (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
+                  <Shield className="h-3.5 w-3.5" />
+                  管理员
+                </div>
+              )}
+              <Button
+                onClick={handleToggleAdmin}
+                disabled={isUpdating}
+                variant={row.is_admin ? "destructive" : "default"}
+                size="sm"
+                className="w-full"
+              >
+                {isUpdating ? "处理中..." : row.is_admin ? "移除管理员权限" : "设为管理员"}
+              </Button>
+            </div>
           </Section>
 
           <Section title="礼品 / 收货">
