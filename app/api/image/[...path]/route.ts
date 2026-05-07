@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
-import { head } from "@vercel/blob"
+import { list, head } from "@vercel/blob"
 
 /**
- * 图片代理 API
- * 用于访问私有 Vercel Blob 存储中的图片
+ * 图片代理 API — 用于访问私有 Vercel Blob 存储中的图片
  * 路径示例: /api/image/breeds/1234567-image.png
  *
- * Vercel Blob 私有存储的 base URL 格式：
- *   https://<store-id>.private.blob.vercel-storage.com
- * 通过环境变量 BLOB_READ_WRITE_TOKEN 的 store ID 部分可以推算，
- * 但更简单的做法是：用 head() 拿到 downloadUrl（带签名），再 fetch 转发给前端。
+ * 原理：用 list({ prefix }) 通过路径找到完整 Blob URL，
+ * 再用 head() 获取带签名的 downloadUrl，最后转发内容给浏览器。
+ * 无需任何额外环境变量，BLOB_READ_WRITE_TOKEN 已自动注入。
  */
 export async function GET(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
@@ -21,34 +19,30 @@ export async function GET(
       return NextResponse.json({ error: "No path provided" }, { status: 400 })
     }
 
+    // pathname 例：breeds/1778165103668-3a533f04.png
     const pathname = path.join("/")
 
-    // 用环境变量拼出完整的 Blob URL
-    // BLOB_STORE_URL 格式：https://<store-id>.private.blob.vercel-storage.com
-    const storeUrl = process.env.BLOB_STORE_URL
-    if (!storeUrl) {
-      console.error("[v0] BLOB_STORE_URL not set")
-      return NextResponse.json({ error: "Storage not configured" }, { status: 500 })
+    // 用 list 按前缀查找，自动得到完整 Blob URL（含 store 域名），无需手动配置
+    const { blobs } = await list({ prefix: pathname, limit: 1 })
+    if (!blobs.length) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 })
     }
 
-    const blobUrl = `${storeUrl}/${pathname}`
+    // head() 返回带签名的临时 downloadUrl，可直接访问私有 blob
+    const metadata = await head(blobs[0].url)
 
-    // head() 会验证文件存在并返回带有临时 downloadUrl 的元数据
-    const metadata = await head(blobUrl)
-
-    // 用 downloadUrl（已签名，可直接访问私有 blob）获取内容并转发给浏览器
     const imageRes = await fetch(metadata.downloadUrl)
     if (!imageRes.ok) {
-      return NextResponse.json({ error: "Failed to fetch image from storage" }, { status: 502 })
+      return NextResponse.json({ error: "Failed to fetch from storage" }, { status: 502 })
     }
 
-    const imageBuffer = await imageRes.arrayBuffer()
-    const contentType = metadata.contentType || "image/jpeg"
+    const buffer = await imageRes.arrayBuffer()
 
-    return new NextResponse(imageBuffer, {
+    return new NextResponse(buffer, {
       headers: {
-        "Content-Type": contentType,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        "Content-Type": metadata.contentType || "image/jpeg",
+        // 缓存 1 天（downloadUrl 是临时签名链接，不适合永久缓存）
+        "Cache-Control": "public, max-age=86400",
       },
     })
   } catch (error) {
