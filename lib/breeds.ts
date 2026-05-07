@@ -114,6 +114,41 @@ export async function listAllBreeds(): Promise<Breed[]> {
   return (data as BreedRow[]).map(toBreed)
 }
 
+/** 后台分页查询品种（带总数） */
+export async function listAllBreedsWithPagination(page: number = 1, pageSize: number = 50) {
+  const supabase = await createClient()
+  
+  // 获取总数
+  const { count, error: countError } = await supabase
+    .from("breeds")
+    .select("*", { count: "exact", head: true })
+  
+  if (countError) {
+    console.error("[v0] listAllBreedsWithPagination count error:", countError)
+    return { breeds: [], total: 0, page, pageSize }
+  }
+
+  const offset = (page - 1) * pageSize
+  const { data, error } = await supabase
+    .from("breeds")
+    .select("*")
+    .order("display_order", { ascending: true })
+    .order("name", { ascending: true })
+    .range(offset, offset + pageSize - 1)
+
+  if (error) {
+    console.error("[v0] listAllBreedsWithPagination error:", error)
+    return { breeds: [], total: count ?? 0, page, pageSize }
+  }
+
+  return {
+    breeds: (data as BreedRow[]).map(toBreed),
+    total: count ?? 0,
+    page,
+    pageSize,
+  }
+}
+
 /** 单个品种 */
 export async function getBreed(slug: string): Promise<Breed | null> {
   const supabase = await createClient()
