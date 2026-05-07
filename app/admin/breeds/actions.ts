@@ -199,12 +199,26 @@ export async function importBreedsBulk(breeds: Array<{
   is_published?: boolean
   display_order?: number
 }>) {
-  if (!breeds.length) throw new Error("No breeds to import")
+  if (!breeds.length) throw new Error("没有品种数据要导入")
   
   const supabase = await assertAdmin()
   
+  // 去重 - 保留第一个slug重复的品种
+  const seen = new Set<string>()
+  const uniqueBreeds = breeds.filter((breed) => {
+    const slug = slugify(breed.slug || breed.name)
+    if (seen.has(slug)) {
+      console.warn(`[v0] 导入时发现重复的品种 slug，将跳过: ${slug} (${breed.name})`)
+      return false
+    }
+    seen.add(slug)
+    return true
+  })
+
+  console.log(`[v0] 导入品种: 总计 ${breeds.length} 条，去重后 ${uniqueBreeds.length} 条`)
+  
   // Normalize and prepare data
-  const normalizedBreeds = breeds.map((breed) => ({
+  const normalizedBreeds = uniqueBreeds.map((breed) => ({
     slug: slugify(breed.slug || breed.name),
     name: breed.name,
     cn_name: breed.cn_name || null,
