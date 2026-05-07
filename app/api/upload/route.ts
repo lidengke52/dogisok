@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     const filename = `breeds/${timestamp}-${file.name}`
 
     const blob = await put(filename, buffer, {
-      access: "public",
+      access: "private",
       contentType: file.type,
     })
 
