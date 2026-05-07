@@ -1,9 +1,31 @@
 import { read, utils } from 'xlsx';
 
-/** 首字母大写：hound -> Hound */
-function capitalizeFirst(str: string): string {
-  if (!str) return ''
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+/** 将 CSV 里的分组值标准化为系统允许的值
+ * 支持：hound / Hound / HOUND / NON-sporting / non-sporting / Non-Sporting 等
+ */
+function normalizeGroup(raw: string): string {
+  const map: Record<string, string> = {
+    sporting: 'Sporting',
+    herding: 'Herding',
+    working: 'Working',
+    toy: 'Toy',
+    terrier: 'Terrier',
+    hound: 'Hound',
+    'non-sporting': 'Non-Sporting',
+    nonsporting: 'Non-Sporting',
+    'non sporting': 'Non-Sporting',
+  }
+  return map[raw.toLowerCase().replace(/\s+/g, ' ').trim()] ?? 'Non-Sporting'
+}
+
+/** 将 CSV 里的体型值标准化：small/medium/large -> Small/Medium/Large */
+function normalizeSize(raw: string): string {
+  const map: Record<string, string> = {
+    small: 'Small',
+    medium: 'Medium',
+    large: 'Large',
+  }
+  return map[raw.toLowerCase().trim()] ?? 'Medium'
 }
 
 export interface BreedRow {
@@ -60,9 +82,9 @@ export async function parseBreedFile(file: File): Promise<BreedRow[]> {
             temperament: row[7]?.toString().trim() || '',
             care_notes: row[8]?.toString().trim() || '',
             common_health: row[9]?.toString().trim() || '',
-            // 大小写标准化：hound -> Hound，toy -> Toy
-            group_name: capitalizeFirst(row[10]?.toString().trim() || ''),
-            size: capitalizeFirst(row[11]?.toString().trim() || ''),
+            // 精确映射：NON-sporting / hound / working 等 -> 系统允许的值
+            group_name: normalizeGroup(row[10]?.toString() || ''),
+            size: normalizeSize(row[11]?.toString() || ''),
             trainability: parseInt(row[12]) || 3,
             shedding: parseInt(row[13]) || 3,
             exercise: parseInt(row[14]) || 3,
