@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { MarkdownEditor } from "@/components/admin/markdown-editor"
+import { BreedSelect } from "@/components/admin/breed-select"
+import { ImageUploader } from "@/components/admin/image-uploader"
 import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 import { createArticle, updateArticle, type ArticleFormState } from "@/app/admin/articles/actions"
 
@@ -158,20 +160,11 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
 
             <div className="space-y-1.5">
               <Label htmlFor="breed_slug">关联犬种（可选）</Label>
-              <select
-                id="breed_slug"
+              <BreedSelect
                 name="breed_slug"
-                defaultValue={article?.breed_slug ?? "none"}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="none">不关联</option>
-                {breeds.map((b) => (
-                  <option key={b.slug} value={b.slug}>
-                    {b.name}
-                    {b.cnName ? ` · ${b.cnName}` : ""}
-                  </option>
-                ))}
-              </select>
+                breeds={breeds}
+                defaultValue={article?.breed_slug}
+              />
               <p className="text-xs text-muted-foreground">
                 关联后，该文章会出现在 /breeds/&lt;slug&gt; 页面的"相关文章"区。
               </p>
@@ -210,14 +203,8 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="cover_image">封面图</Label>
-              <Input
-                id="cover_image"
-                name="cover_image"
-                defaultValue={article?.cover_image ?? ""}
-                placeholder="/images/xxx.jpg 或 https://..."
-              />
-              <p className="text-xs text-muted-foreground">支持本地路径或完整 URL。</p>
+              <Label>封面图</Label>
+              <ImageUploader name="cover_image" defaultValue={article?.cover_image ?? ""} />
             </div>
           </div>
         </aside>

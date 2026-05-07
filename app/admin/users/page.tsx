@@ -26,7 +26,7 @@ export default async function AdminUsersPage() {
   const { data: profiles } = await supabase
     .from("profiles")
     .select(
-      "id, email, display_name, invite_code, invited_by, gift_claimed, recipient_name, phone, postal_code, street_address, city, state, country, created_at",
+      "id, email, display_name, invite_code, invited_by, gift_claimed, recipient_name, phone, postal_code, street_address, city, state, country, created_at, is_admin",
     )
     .order("created_at", { ascending: false })
 
@@ -73,6 +73,7 @@ export default async function AdminUsersPage() {
     country: p.country,
     has_address: Boolean(p.recipient_name && p.phone && p.street_address && p.city && p.country),
     created_at: p.created_at,
+    is_admin: p.is_admin ?? false,
   }))
 
   // 顶部统计
