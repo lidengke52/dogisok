@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import Link from "next/link"
 import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ImageUploader } from "@/components/admin/image-uploader"
 import type { Breed } from "@/lib/breeds"
 import { createBreed, updateBreed, type BreedFormState } from "@/app/admin/breeds/actions"
 
@@ -31,6 +32,7 @@ export function BreedForm({ mode, breed, slug }: Props) {
       : createBreed
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
+  const [imageUrl, setImageUrl] = useState(breed?.image ?? "")
 
   return (
     <form action={formAction} className="space-y-6">
@@ -191,11 +193,10 @@ export function BreedForm({ mode, breed, slug }: Props) {
 
             <div className="space-y-1.5">
               <Label htmlFor="image">封面图</Label>
-              <Input
-                id="image"
+              <ImageUploader
+                value={imageUrl}
+                onChange={setImageUrl}
                 name="image"
-                defaultValue={breed?.image ?? ""}
-                placeholder="/images/breed-xxx.jpg 或 https://..."
               />
             </div>
 

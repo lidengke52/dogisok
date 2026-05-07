@@ -1,9 +1,10 @@
 import Link from "next/link"
 import { redirect } from "next/navigation"
-import { Plus } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { isAdmin } from "@/lib/admin"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { BreedsTable } from "@/components/admin/breeds-table"
 import { listAllBreedsWithPagination } from "@/lib/breeds"
 
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic"
 export const metadata = { title: "犬种库 · 管理后台" }
 
 interface PageProps {
-  searchParams: Promise<{ page?: string }>
+  searchParams: Promise<{ page?: string; search?: string }>
 }
 
 export default async function AdminBreedsPage({ searchParams }: PageProps) {
@@ -24,9 +25,10 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
 
   const params = await searchParams
   const page = Math.max(1, parseInt(params.page || "1", 10))
-  const pageSize = 50
+  const search = params.search?.trim() || ""
+  const pageSize = 20
 
-  const { breeds, total } = await listAllBreedsWithPagination(page, pageSize)
+  const { breeds, total } = await listAllBreedsWithPagination(page, pageSize, search)
   const totalPages = Math.ceil(total / pageSize)
 
   return (
@@ -55,6 +57,34 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
         </div>
       </header>
 
+      {/* 搜索栏 */}
+      <form action="/admin/breeds" method="get" className="mt-6">
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              name="search"
+              placeholder="按品种名称搜索..."
+              defaultValue={search}
+              className="pl-10"
+            />
+          </div>
+          <Button type="submit">搜索</Button>
+          {search && (
+            <Button asChild variant="outline">
+              <Link href="/admin/breeds">清除</Link>
+            </Button>
+          )}
+        </div>
+      </form>
+
+      {search && (
+        <p className="mt-4 text-sm text-muted-foreground">
+          搜索结果："{search}" ({total} 条)
+        </p>
+      )}
+
       <section className="mt-8">
         <BreedsTable breeds={breeds} />
       </section>
@@ -66,7 +96,7 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
             variant="outline"
             disabled={page === 1}
           >
-            <Link href={`/admin/breeds?page=${page - 1}`}>
+            <Link href={`/admin/breeds?page=${page - 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}>
               上一页
             </Link>
           </Button>
@@ -81,7 +111,7 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
                   variant={page === p ? "default" : "outline"}
                   size="sm"
                 >
-                  <Link href={`/admin/breeds?page=${p}`}>
+                  <Link href={`/admin/breeds?page=${p}${search ? `&search=${encodeURIComponent(search)}` : ""}`}>
                     {p}
                   </Link>
                 </Button>
@@ -95,7 +125,7 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
                   variant="outline"
                   size="sm"
                 >
-                  <Link href={`/admin/breeds?page=${totalPages}`}>
+                  <Link href={`/admin/breeds?page=${totalPages}${search ? `&search=${encodeURIComponent(search)}` : ""}`}>
                     {totalPages}
                   </Link>
                 </Button>
@@ -108,7 +138,7 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
             variant="outline"
             disabled={page === totalPages}
           >
-            <Link href={`/admin/breeds?page=${page + 1}`}>
+            <Link href={`/admin/breeds?page=${page + 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}>
               下一页
             </Link>
           </Button>
