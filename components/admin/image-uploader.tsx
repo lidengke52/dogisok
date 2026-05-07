@@ -41,6 +41,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
       const formData = new FormData()
       formData.append("file", file)
 
+      console.log("[v0] Uploading file:", file.name)
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
@@ -53,6 +54,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
 
       const data = await response.json()
       const imageUrl = data.url
+      console.log("[v0] Upload successful, URL:", imageUrl)
 
       onChange(imageUrl)
       setPreview(imageUrl)
@@ -60,6 +62,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
       toast.success("图片上传成功")
     } catch (err) {
       const message = err instanceof Error ? err.message : "上传失败"
+      console.error("[v0] Upload error:", message)
       setError(message)
       toast.error(message)
     } finally {
