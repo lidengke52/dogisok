@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Field, FieldGroup, FieldLabel, FieldDescription } from "@/components/ui/field"
+import { ImageUploader } from "@/components/admin/image-uploader"
 import { createProductAd, updateProductAd, type AdFormState } from "@/app/admin/product-ads/actions"
 import type { ProductAd } from "@/lib/product-ads"
 
@@ -82,14 +83,8 @@ export function ProductAdForm({ ad }: Props) {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="image_url">图片 URL</FieldLabel>
-          <Input
-            id="image_url"
-            name="image_url"
-            type="url"
-            placeholder="https://..."
-            defaultValue={ad?.image_url ?? ""}
-          />
+          <FieldLabel>图片</FieldLabel>
+          <ImageUploader name="image_url" defaultValue={ad?.image_url ?? ""} />
           <FieldDescription>选填。建议尺寸 800×600。留空则使用默认占位图标。</FieldDescription>
         </Field>
 
