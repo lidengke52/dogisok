@@ -4,8 +4,8 @@ import { isAdmin } from '@/lib/admin'
 import { BulkImportBreedsForm } from '@/components/admin/bulk-import-breeds-form'
 
 export const metadata = {
-  title: 'Import Breeds',
-  description: 'Bulk import dog breeds from XLSX or CSV file',
+  title: '批量导入品种 · 管理后台',
+  description: '从 XLSX 或 CSV 文件批量导入狗品种',
 }
 
 export default async function ImportBreedsPage() {
@@ -21,9 +21,9 @@ export default async function ImportBreedsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Import Breeds</h1>
+        <h1 className="text-3xl font-bold tracking-tight">批量导入品种</h1>
         <p className="text-muted-foreground mt-2">
-          Upload XLSX or CSV file to bulk import dog breed data
+          从 XLSX 或 CSV 文件批量导入狗品种数据
         </p>
       </div>
 
@@ -32,11 +32,11 @@ export default async function ImportBreedsPage() {
       </div>
 
       <div className="bg-blue-50 rounded-lg border border-blue-200 p-4 text-sm text-blue-900">
-        <h3 className="font-semibold mb-2">File Format Requirements:</h3>
+        <h3 className="font-semibold mb-2">文件格式要求：</h3>
         <ul className="list-disc list-inside space-y-1">
-          <li>Header row: Dog breeds, English name, summary, Origins, Lifetime, Weight range, Shoulder height range, Character key words, Precautions for feeding, Common health issues, Grouping, body shape, training, Hair shedding, Sports needs, Is it appropriate to get along with children</li>
-          <li>Each row represents one breed</li>
-          <li>Supported formats: XLSX, XLS, CSV</li>
+          <li>表头行: 中文名、英文名、描述、原产地、寿命、体重范围、身高范围、性格特征、护理建议、常见疾病、分类、体型、训练难度、掉毛程度、运动需求、适合与孩子相处</li>
+          <li>每行代表一个品种</li>
+          <li>支持格式: XLSX、XLS、CSV</li>
         </ul>
       </div>
     </div>

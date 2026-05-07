@@ -29,13 +29,13 @@ export function BulkImportBreedsForm() {
       setFile(selectedFile)
       setPreview(previewData)
       toast({
-        title: 'File loaded',
-        description: `Ready to import ${rows.length} breeds`,
+        title: '文件已加载',
+        description: `准备导入 ${rows.length} 个品种`,
       })
     } catch (err) {
       toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to parse file',
+        title: '错误',
+        description: err instanceof Error ? err.message : '文件解析失败',
         variant: 'destructive',
       })
     } finally {
@@ -76,16 +76,16 @@ export function BulkImportBreedsForm() {
       await importBreedsBulk(breedsToImport)
       
       toast({
-        title: 'Success',
-        description: `Imported ${breedsToImport.length} breeds successfully`,
+        title: '成功',
+        description: `成功导入 ${breedsToImport.length} 个品种`,
       })
       
       setFile(null)
       setPreview([])
     } catch (err) {
       toast({
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Import failed',
+        title: '错误',
+        description: err instanceof Error ? err.message : '导入失败',
         variant: 'destructive',
       })
     } finally {
@@ -97,7 +97,7 @@ export function BulkImportBreedsForm() {
     <div className="space-y-6">
       <div className="space-y-2">
         <label className="block text-sm font-medium">
-          Upload XLSX or CSV file
+          上传 XLSX 或 CSV 文件
         </label>
         <input
           type="file"
@@ -107,22 +107,22 @@ export function BulkImportBreedsForm() {
           className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
         />
         <p className="text-xs text-muted-foreground">
-          Supported formats: XLSX, XLS, CSV
+          支持格式: XLSX、XLS、CSV
         </p>
       </div>
 
       {preview.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-medium">Preview (first 5 rows)</h3>
+          <h3 className="text-sm font-medium">预览 (前 5 行)</h3>
           <div className="overflow-x-auto border rounded-lg">
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b bg-muted">
-                  <th className="px-3 py-2 text-left">Name (EN)</th>
-                  <th className="px-3 py-2 text-left">Name (CN)</th>
+                  <th className="px-3 py-2 text-left">英文名</th>
+                  <th className="px-3 py-2 text-left">中文名</th>
                   <th className="px-3 py-2 text-left">Slug</th>
-                  <th className="px-3 py-2 text-left">Group</th>
-                  <th className="px-3 py-2 text-left">Size</th>
+                  <th className="px-3 py-2 text-left">分类</th>
+                  <th className="px-3 py-2 text-left">体型</th>
                 </tr>
               </thead>
               <tbody>
@@ -147,7 +147,7 @@ export function BulkImportBreedsForm() {
           disabled={!file || isLoading}
           loading={isLoading}
         >
-          {isLoading ? 'Importing...' : 'Import All'}
+          {isLoading ? '导入中...' : '导入全部'}
         </Button>
         {file && (
           <Button
@@ -158,7 +158,7 @@ export function BulkImportBreedsForm() {
             }}
             disabled={isLoading}
           >
-            Clear
+            清空
           </Button>
         )}
       </div>
