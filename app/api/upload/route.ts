@@ -36,7 +36,10 @@ export async function POST(request: NextRequest) {
       contentType: file.type,
     })
 
-    return NextResponse.json({ url: blob.url })
+    // 返回代理URL而不是直接的Blob URL（这样可以在前端加载私有图片）
+    const proxyUrl = `/api/image/${blob.pathname}`
+
+    return NextResponse.json({ url: proxyUrl })
   } catch (error) {
     console.error("[v0] Image upload error:", error)
     return NextResponse.json(
