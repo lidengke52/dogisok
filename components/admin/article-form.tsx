@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { MarkdownEditor } from "@/components/admin/markdown-editor"
 import { BreedSelect } from "@/components/admin/breed-select"
+import { ImageUploader } from "@/components/admin/image-uploader"
 import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 import { createArticle, updateArticle, type ArticleFormState } from "@/app/admin/articles/actions"
 
@@ -202,14 +203,8 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="cover_image">封面图</Label>
-              <Input
-                id="cover_image"
-                name="cover_image"
-                defaultValue={article?.cover_image ?? ""}
-                placeholder="/images/xxx.jpg 或 https://..."
-              />
-              <p className="text-xs text-muted-foreground">支持本地路径或完整 URL。</p>
+              <Label>封面图</Label>
+              <ImageUploader name="cover_image" defaultValue={article?.cover_image ?? ""} />
             </div>
           </div>
         </aside>
