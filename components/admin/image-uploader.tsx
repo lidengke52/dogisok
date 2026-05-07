@@ -20,6 +20,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string>(value || "")
   const [urlInput, setUrlInput] = useState(value || "")
   const [error, setError] = useState("")
+  const [imageLoading, setImageLoading] = useState(false)
 
   const handleFileUpload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -34,6 +35,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
 
     setError("")
     setUploading(true)
+    setImageLoading(true)
 
     try {
       const formData = new FormData()
@@ -45,7 +47,8 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
       })
 
       if (!response.ok) {
-        throw new Error("上传失败")
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || "上传失败")
       }
 
       const data = await response.json()
@@ -61,6 +64,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
       toast.error(message)
     } finally {
       setUploading(false)
+      setImageLoading(false)
     }
   }
 
@@ -160,15 +164,24 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
         <div className="space-y-2">
           <Label>预览</Label>
           <div className="relative inline-block w-full max-w-xs overflow-hidden rounded-lg border border-border bg-muted">
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-10">
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted-foreground border-t-primary" />
+              </div>
+            )}
             <Image
               src={preview}
               alt="Preview"
               width={300}
               height={200}
               className="h-48 w-full object-cover"
-              onError={() => setError("图片加载失败，请检查URL")}
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageLoading(false)
+                setError("图片加载失败，请检查URL")
+              }}
             />
-            {preview && (
+            {preview && !imageLoading && (
               <Button
                 type="button"
                 variant="ghost"
@@ -185,7 +198,7 @@ export function ImageUploader({ value, onChange, name }: ImageUploaderProps) {
       )}
 
       {/* 隐藏的input存储最终值 */}
-      <Input type="hidden" name={name} value={preview} />
+      <input type="hidden" name={name} value={preview} />
     </div>
   )
 }
