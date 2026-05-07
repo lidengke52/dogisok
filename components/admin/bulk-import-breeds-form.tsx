@@ -16,9 +16,24 @@ export function BulkImportBreedsForm() {
     const selectedFile = e.target.files?.[0]
     if (!selectedFile) return
 
+    // 先设置 file，确保按钮不会因为 file===null 而保持禁用
+    setFile(selectedFile)
+    setPreview([])
+
     try {
       setIsLoading(true)
+      console.log("[v0] Parsing file:", selectedFile.name, selectedFile.size)
       const rows = await parseBreedFile(selectedFile)
+      console.log("[v0] Parsed rows:", rows.length, "first row:", rows[0])
+
+      if (rows.length === 0) {
+        toast({
+          title: '文件为空',
+          description: '未找到有效数据行，请确认文件格式正确',
+          variant: 'destructive',
+        })
+        return
+      }
       
       // Preview first 5 rows
       const previewData = rows.slice(0, 5).map((row, idx) => ({
@@ -26,15 +41,15 @@ export function BulkImportBreedsForm() {
         slug: generateSlug(row.name || row.cn_name || `breed-${idx}`),
       }))
       
-      setFile(selectedFile)
       setPreview(previewData)
       toast({
         title: '文件已加载',
         description: `准备导入 ${rows.length} 个品种`,
       })
     } catch (err) {
+      console.error("[v0] Parse error:", err)
       toast({
-        title: '错误',
+        title: '解析失败',
         description: err instanceof Error ? err.message : '文件解析失败',
         variant: 'destructive',
       })
