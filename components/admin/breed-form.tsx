@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState, useState } from "react"
+import { useActionState } from "react"
 import Link from "next/link"
 import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ImageUploader } from "@/components/admin/image-uploader"
 import type { Breed } from "@/lib/breeds"
 import { createBreed, updateBreed, type BreedFormState } from "@/app/admin/breeds/actions"
 
@@ -24,15 +23,12 @@ const GROUPS = ["Sporting", "Herding", "Working", "Toy", "Non-Sporting", "Terrie
 const SIZES = ["Small", "Medium", "Large"]
 
 export function BreedForm({ mode, breed, slug }: Props) {
-  // 在客户端把 slug 绑定到 Server Action 上，这样父级 Server Component 只需要传基础数据，
-  // 不会跨 Server/Client 边界传递包装函数（这是不允许的）。
   const actionFn =
     mode === "edit" && slug
       ? (prev: BreedFormState, formData: FormData) => updateBreed(slug, prev, formData)
       : createBreed
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
-  const [imageUrl, setImageUrl] = useState(breed?.image ?? "")
 
   return (
     <form action={formAction} className="space-y-6">
@@ -192,12 +188,18 @@ export function BreedForm({ mode, breed, slug }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="image">封面图</Label>
-              <ImageUploader
-                value={imageUrl}
-                onChange={setImageUrl}
+              <Label htmlFor="image">封面图（URL）</Label>
+              <Input
+                id="image"
                 name="image"
+                type="url"
+                defaultValue={breed?.image ?? ""}
+                placeholder="https://... 或 /api/image/breeds/..."
+                className="font-mono text-sm"
               />
+              <p className="text-xs text-muted-foreground">
+                支持外部URL或Vercel Blob私有图片URL（通过/api/image/代理）
+              </p>
             </div>
 
             <div className="space-y-1.5">
