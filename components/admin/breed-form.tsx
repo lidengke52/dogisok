@@ -30,8 +30,14 @@ export function BreedForm({ mode, breed, slug }: Props) {
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("[v0] Form submitted, pending:", pending)
+    const formData = new FormData(e.currentTarget)
+    console.log("[v0] Form data - name:", formData.get("name"), "slug:", formData.get("slug"))
+  }
+
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} onSubmit={handleSubmit} className="space-y-6">
       <div className="flex items-center justify-between">
         <Button type="button" variant="ghost" size="sm" className="gap-1.5" asChild>
           <Link href="/admin/breeds">
@@ -61,7 +67,7 @@ export function BreedForm({ mode, breed, slug }: Props) {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="cn_name">中文名</Label>
-              <Input id="cn_name" name="cn_name" defaultValue={breed?.cnName ?? ""} placeholder="金毛" />
+              <Input id="cn_name" name="cn_name" defaultValue={breed?.cn_name ?? ""} placeholder="金毛" />
             </div>
           </div>
 
