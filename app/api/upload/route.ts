@@ -27,7 +27,9 @@ export async function POST(request: NextRequest) {
 
     const buffer = await file.arrayBuffer()
     const timestamp = Date.now()
-    const filename = `breeds/${timestamp}-${file.name}`
+    // 去除空格和特殊字符，避免 Blob list() 路径匹配失败
+    const safeName = file.name.replace(/\s+/g, "-").replace(/[^\w.\-]/g, "")
+    const filename = `breeds/${timestamp}-${safeName}`
 
     const blob = await put(filename, buffer, {
       access: "private",
