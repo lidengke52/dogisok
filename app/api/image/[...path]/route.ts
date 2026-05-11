@@ -24,7 +24,8 @@ export async function GET(
     }
 
     // pathname 例：breeds/1778165103668-3a533f04.png
-    const pathname = path.join("/")
+    // decodeURIComponent 处理文件名中的 %20 等编码字符
+    const pathname = path.map((p) => decodeURIComponent(p)).join("/")
 
     // list() 用 token 鉴权，找到完整的私有 Blob URL
     const { blobs } = await list({ prefix: pathname, limit: 1 })
