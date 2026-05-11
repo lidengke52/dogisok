@@ -129,7 +129,6 @@ export default function AboutPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-muted-foreground ml-4">
                   <li>• Chat-like interface for describing your concerns</li>
-                  <li>• Upload photos or videos for analysis</li>
                   <li>• Get preliminary analysis and care suggestions</li>
                   <li>• Guidance on whether in-person vet visit is needed</li>
                   <li>• Based on large-scale canine medical data and AI models</li>
