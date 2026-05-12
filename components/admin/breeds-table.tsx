@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils"
 import type { Breed } from "@/lib/breeds"
 import { deleteBreed, toggleBreedPublished, deleteBreedsBulk } from "@/app/admin/breeds/actions"
 
-export function BreedsTable({ breeds }: { breeds: Breed[] }) {
+export function BreedsTable({ breeds, page = "1", search = "" }: { breeds: Breed[]; page?: string; search?: string }) {
   const [pending, startTransition] = useTransition()
   const [deletingSlug, setDeletingSlug] = useState<string | null>(null)
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -179,7 +179,7 @@ export function BreedsTable({ breeds }: { breeds: Breed[] }) {
                 <td className="px-4 py-3 text-right">
                   <div className="inline-flex gap-1">
                     <Button asChild size="sm" variant="ghost">
-                      <Link href={`/admin/breeds/${b.slug}/edit`} aria-label={`编辑 ${b.name}`}>
+                      <Link href={`/admin/breeds/${b.slug}/edit?page=${page}${search ? `&search=${encodeURIComponent(search)}` : ""}`} aria-label={`编辑 ${b.name}`}>
                         <Pencil className="h-4 w-4" />
                       </Link>
                     </Button>
