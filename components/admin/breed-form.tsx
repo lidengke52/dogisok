@@ -19,16 +19,18 @@ type Props = {
   breed?: Breed
   /** 编辑模式下需要传入当前 slug，用于在客户端绑定到 updateBreed */
   slug?: string
+  /** 分页时的当前页码，用于保存后返回同一页 */
+  page?: string
 }
 
 const GROUPS = ["Sporting", "Herding", "Working", "Toy", "Non-Sporting", "Terrier", "Hound"]
 const SIZES = ["Small", "Medium", "Large"]
 
-export function BreedForm({ mode, breed, slug }: Props) {
+export function BreedForm({ mode, breed, slug, page = "1" }: Props) {
   // 使用 .bind() 而不是 inline arrow function，因为 server actions 必须保持为 server function
   const actionFn =
     mode === "edit" && slug
-      ? updateBreed.bind(null, slug)
+      ? updateBreed.bind(null, slug, page)
       : createBreed
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
@@ -40,11 +42,11 @@ export function BreedForm({ mode, breed, slug }: Props) {
       toast({ title: "成功", description: state.message })
       // toast 显示后 1 秒重定向，给用户看到提示
       const timer = setTimeout(() => {
-        window.location.href = "/admin/breeds"
+        window.location.href = `/admin/breeds?page=${page}`
       }, 1000)
       return () => clearTimeout(timer)
     }
-  }, [state.success, state.message, toast])
+  }, [state.success, state.message, toast, page])
 
   return (
     <form action={formAction} className="space-y-6">

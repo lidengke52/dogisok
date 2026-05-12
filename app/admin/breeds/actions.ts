@@ -114,6 +114,7 @@ export async function createBreed(_prev: BreedFormState, formData: FormData): Pr
 
 export async function updateBreed(
   slug: string,
+  page: string,
   _prev: BreedFormState,
   formData: FormData,
 ): Promise<BreedFormState> {

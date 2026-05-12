@@ -9,10 +9,13 @@ export const metadata = { title: "编辑品种 · 管理后台" }
 
 type PageProps = {
   params: Promise<{ slug: string }>
+  searchParams: Promise<{ page?: string; search?: string }>
 }
 
-export default async function EditBreedPage({ params }: PageProps) {
+export default async function EditBreedPage({ params, searchParams }: PageProps) {
   const { slug } = await params
+  const sp = await searchParams
+  const page = sp.page || "1"
 
   const supabase = await createClient()
   const {
@@ -30,7 +33,7 @@ export default async function EditBreedPage({ params }: PageProps) {
         <h1 className="text-2xl font-semibold tracking-tight">编辑品种</h1>
         <p className="mt-1 font-mono text-xs text-muted-foreground">/breeds/{breed.slug}</p>
       </div>
-      <BreedForm mode="edit" breed={breed} slug={slug} />
+      <BreedForm mode="edit" breed={breed} slug={slug} page={page} />
     </div>
   )
 }
