@@ -86,7 +86,7 @@ export default async function AdminBreedsPage({ searchParams }: PageProps) {
       )}
 
       <section className="mt-8">
-        <BreedsTable breeds={breeds} />
+        <BreedsTable breeds={breeds} page={String(page)} search={search} />
       </section>
 
       {totalPages > 1 && (

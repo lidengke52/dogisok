@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import Link from "next/link"
 import { AlertCircle, ArrowLeft, Save } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ImageUploader } from "@/components/admin/image-uploader"
+import { useToast } from "@/hooks/use-toast"
 import type { Breed } from "@/lib/breeds"
 import { createBreed, updateBreed, type BreedFormState } from "@/app/admin/breeds/actions"
 
@@ -18,19 +19,34 @@ type Props = {
   breed?: Breed
   /** 编辑模式下需要传入当前 slug，用于在客户端绑定到 updateBreed */
   slug?: string
+  /** 分页时的当前页码，用于保存后返回同一页 */
+  page?: string
 }
 
 const GROUPS = ["Sporting", "Herding", "Working", "Toy", "Non-Sporting", "Terrier", "Hound"]
 const SIZES = ["Small", "Medium", "Large"]
 
-export function BreedForm({ mode, breed, slug }: Props) {
+export function BreedForm({ mode, breed, slug, page = "1" }: Props) {
   // 使用 .bind() 而不是 inline arrow function，因为 server actions 必须保持为 server function
   const actionFn =
     mode === "edit" && slug
-      ? updateBreed.bind(null, slug)
+      ? updateBreed.bind(null, slug, page)
       : createBreed
 
   const [state, formAction, pending] = useActionState<BreedFormState, FormData>(actionFn, {})
+  const { toast } = useToast()
+
+  // 当成功保存时显示 toast，然后重定向
+  useEffect(() => {
+    if (state.success && state.message) {
+      toast({ title: "成功", description: state.message })
+      // toast 显示后 1 秒重定向，给用户看到提示
+      const timer = setTimeout(() => {
+        window.location.href = `/admin/breeds?page=${page}`
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [state.success, state.message, toast, page])
 
   return (
     <form action={formAction} className="space-y-6">

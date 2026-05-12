@@ -23,6 +23,7 @@ async function assertAdmin() {
 export type BreedFormState = {
   error?: string
   success?: boolean
+  message?: string
 }
 
 const ALLOWED_GROUPS = ["Sporting", "Herding", "Working", "Toy", "Non-Sporting", "Terrier", "Hound"] as const
@@ -106,11 +107,14 @@ export async function createBreed(_prev: BreedFormState, formData: FormData): Pr
 
   revalidatePath("/admin/breeds")
   revalidatePath("/breeds")
-  redirect("/admin/breeds")
+  
+  // 返回成功状态后重定向（给客户端时间显示 toast）
+  return { success: true, message: `品种 ${String(formData.get("name"))} 创建成功` }
 }
 
 export async function updateBreed(
   slug: string,
+  page: string,
   _prev: BreedFormState,
   formData: FormData,
 ): Promise<BreedFormState> {
@@ -157,7 +161,9 @@ export async function updateBreed(
   revalidatePath("/admin/breeds")
   revalidatePath("/breeds")
   revalidatePath(`/breeds/${slug}`)
-  redirect("/admin/breeds")
+  
+  // 返回成功状态后重定向（给客户端时间显示 toast）
+  return { success: true, message: `品种修改已保存` }
 }
 
 export async function deleteBreed(slug: string) {
