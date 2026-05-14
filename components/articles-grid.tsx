@@ -29,7 +29,7 @@ export function ArticlesGrid({ articles }: { articles: Article[] }) {
             variant="outline"
             size="lg"
           >
-            显示更多
+            Show More
           </Button>
         </div>
       )}
