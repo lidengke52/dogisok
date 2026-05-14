@@ -9,6 +9,7 @@ const navigation = [
   { name: "Home", href: "/" },
   { name: "Articles", href: "/articles" },
   { name: "Can Eat", href: "/articles?category=food" },
+  { name: "Can Do", href: "/articles?category=behavior" },
   { name: "Breeds", href: "/breeds" },
   { name: "Self-Check", href: "/disease-check" },
   { name: "Medications", href: "/medication-check" },

@@ -20,26 +20,46 @@ const FILTERS = [
 ]
 
 type PageProps = {
-  searchParams: Promise<{ category?: string; search?: string }>
+  searchParams: Promise<{ category?: string; search?: string; subcategory?: string }>
 }
 
 export default async function ArticlesPage({ searchParams }: PageProps) {
-  const { category = "all", search = "" } = await searchParams
+  const { category = "all", search = "", subcategory } = await searchParams
   const [rows, articleAds] = await Promise.all([
     listPublishedArticles({ category, limit: 100 }),
     getProductAdsByPlacement("articles", 1),
   ])
   
-  // Filter by search query
-  const filtered = search
-    ? rows.filter(
-        (r) =>
-          r.title.toLowerCase().includes(search.toLowerCase()) ||
-          (r.excerpt && r.excerpt.toLowerCase().includes(search.toLowerCase())),
-      )
-    : rows
+  // Filter by search query and subcategory
+  const filtered = rows.filter((r) => {
+    // Search filter
+    const matchesSearch = !search || 
+      r.title.toLowerCase().includes(search.toLowerCase()) ||
+      (r.excerpt && r.excerpt.toLowerCase().includes(search.toLowerCase()))
+    
+    // Subcategory filter (if selected)
+    const matchesSubcategory = !subcategory || r.subcategory === subcategory
+    
+    return matchesSearch && matchesSubcategory
+  })
 
   const items = filtered.map(toCardArticle)
+  
+  // Get subcategories for current category
+  const subcategoryOptions =
+    category === "food"
+      ? [
+          { slug: "safe", label: "Can Eat" },
+          { slug: "caution", label: "Caution" },
+          { slug: "toxic", label: "Toxic" },
+        ]
+      : category === "behavior"
+        ? [
+            { slug: "safe", label: "Can Do" },
+            { slug: "caution", label: "Caution" },
+            { slug: "avoid", label: "Avoid" },
+          ]
+        : []
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -87,6 +107,13 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                 name="category"
                 value={category}
               />
+              {subcategory && (
+                <input
+                  type="hidden"
+                  name="subcategory"
+                  value={subcategory}
+                />
+              )}
               <input
                 type="text"
                 name="search"
@@ -101,6 +128,38 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                 Search
               </button>
             </form>
+
+            {/* Subcategory filters */}
+            {subcategoryOptions.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href={`/articles?category=${category}`}
+                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                    !subcategory
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                  }`}
+                >
+                  All
+                </Link>
+                {subcategoryOptions.map((opt) => {
+                  const active = opt.slug === subcategory
+                  return (
+                    <Link
+                      key={opt.slug}
+                      href={`/articles?category=${category}&subcategory=${opt.slug}`}
+                      className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                        active
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
+                      }`}
+                    >
+                      {opt.label}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </section>
 
