@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/button"
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Articles", href: "/articles" },
-  { name: "Can Eat", href: "/articles?category=can-eat" },
+  { name: "Can Eat", href: "/articles?category=food" },
   { name: "Breeds", href: "/breeds" },
   { name: "Self-Check", href: "/disease-check" },
   { name: "Medications", href: "/medication-check" },
   { name: "Dr. Max", href: "/consultation" },
-  { name: "About", href: "/about" },
 ]
 
 export function HeaderClient({ isAuthed, email }: { isAuthed: boolean; email: string | null }) {
