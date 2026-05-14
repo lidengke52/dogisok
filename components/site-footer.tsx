@@ -6,8 +6,8 @@ const footerNav = [
     title: "Explore",
     links: [
       { name: "All Articles", href: "/articles" },
-      { name: "Can They Eat It?", href: "/articles?category=can-eat" },
-      { name: "Can They Do It?", href: "/articles?category=can-do" },
+      { name: "Can They Eat It?", href: "/articles?category=food" },
+      { name: "Can They Do It?", href: "/articles?category=behavior" },
       { name: "Knowledge Library", href: "/articles?category=knowledge" },
     ],
   },
