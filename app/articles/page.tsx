@@ -30,7 +30,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
     getProductAdsByPlacement("articles", 1),
   ])
   
-  // 搜索过滤
+  // Filter by search query
   const filtered = search
     ? rows.filter(
         (r) =>
@@ -60,7 +60,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
 
         <section className="mx-auto max-w-7xl px-4 py-8 md:px-6 lg:px-8">
           <div className="space-y-4">
-            {/* 分类过滤 */}
+            {/* Category filters */}
             <div className="flex flex-wrap gap-2">
               {FILTERS.map((f) => {
                 const active = f.slug === category
@@ -80,7 +80,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
               })}
             </div>
 
-            {/* 搜索框 */}
+            {/* Search form */}
             <form method="GET" className="flex gap-2">
               <input
                 type="hidden"
@@ -91,14 +91,14 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                 type="text"
                 name="search"
                 defaultValue={search}
-                placeholder="搜索文章..."
+                placeholder="Search articles..."
                 className="flex-1 rounded-lg border border-input bg-background px-4 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               />
               <button
                 type="submit"
                 className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
-                搜索
+                Search
               </button>
             </form>
           </div>
