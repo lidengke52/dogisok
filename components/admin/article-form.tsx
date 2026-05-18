@@ -43,11 +43,19 @@ type Props = {
 }
 
 const CATEGORIES = [
-  { value: "food", label: "能吃啥(食物)" },
-  { value: "behavior", label: "能做啥(行为)" },
-  { value: "knowledge", label: "知识库" },
-  { value: "breed", label: "犬种指南" },
-  { value: "health", label: "健康" },
+  { value: "food", label: "能吃啥(食物)", subcategories: [
+    { value: "safe", label: "可以吃" },
+    { value: "caution", label: "慎吃" },
+    { value: "toxic", label: "禁吃" },
+  ]},
+  { value: "behavior", label: "能做啥(行为)", subcategories: [
+    { value: "safe", label: "可以做" },
+    { value: "caution", label: "慎做" },
+    { value: "avoid", label: "禁做" },
+  ]},
+  { value: "knowledge", label: "知识库", subcategories: [] },
+  { value: "breed", label: "犬种指南", subcategories: [] },
+  { value: "health", label: "健康", subcategories: [] },
 ]
 
 export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
@@ -58,6 +66,11 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
       : createArticle
 
   const [state, formAction, pending] = useActionState<ArticleFormState, FormData>(actionFn, {})
+  
+  // Get subcategories for selected category
+  const selectedCategory = article?.category || "knowledge"
+  const categoryObj = CATEGORIES.find(c => c.value === selectedCategory)
+  const subcategories = categoryObj?.subcategories || []
 
   return (
     <form action={formAction} className="space-y-6">
@@ -150,12 +163,23 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
 
             <div className="space-y-1.5">
               <Label htmlFor="subcategory">子分类</Label>
-              <Input
-                id="subcategory"
-                name="subcategory"
-                defaultValue={article?.subcategory ?? ""}
-                placeholder="例如 fruits / training / grooming"
-              />
+              {subcategories.length > 0 ? (
+                <select
+                  id="subcategory"
+                  name="subcategory"
+                  defaultValue={article?.subcategory ?? ""}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <option value="">不选</option>
+                  {subcategories.map((sub) => (
+                    <option key={sub.value} value={sub.value}>
+                      {sub.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <p className="text-xs text-muted-foreground">该分类暂无子分类</p>
+              )}
             </div>
 
             <div className="space-y-1.5">

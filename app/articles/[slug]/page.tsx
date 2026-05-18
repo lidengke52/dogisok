@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { Clock, CalendarDays, Facebook, Twitter, Share2, ArrowLeft } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -137,7 +138,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
           <div className="mx-auto mt-10 max-w-3xl px-4 pb-16 md:px-6 md:pb-20 lg:px-8">
             <div className="prose-custom max-w-none text-base leading-relaxed text-foreground/90">
               {article.content ? (
-                <ReactMarkdown>{article.content}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
               ) : (
                 <p className="text-muted-foreground">This article has no content yet.</p>
               )}

@@ -155,3 +155,81 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
+
+/* Prose styles for Markdown content */
+.prose-custom {
+  @apply space-y-4;
+}
+
+.prose-custom h1 {
+  @apply mt-6 text-3xl font-bold;
+}
+
+.prose-custom h2 {
+  @apply mt-6 text-2xl font-bold;
+}
+
+.prose-custom h3 {
+  @apply mt-5 text-xl font-bold;
+}
+
+.prose-custom h4,
+.prose-custom h5,
+.prose-custom h6 {
+  @apply mt-4 font-bold;
+}
+
+.prose-custom p {
+  @apply leading-relaxed;
+}
+
+.prose-custom ul,
+.prose-custom ol {
+  @apply my-4 ml-6 space-y-2;
+}
+
+.prose-custom li {
+  @apply leading-relaxed;
+}
+
+.prose-custom blockquote {
+  @apply border-l-4 border-primary/30 bg-primary/5 px-4 py-2 italic text-muted-foreground;
+}
+
+.prose-custom code {
+  @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm text-foreground;
+}
+
+.prose-custom pre {
+  @apply my-4 overflow-x-auto rounded-lg bg-muted p-4;
+}
+
+.prose-custom pre code {
+  @apply bg-transparent p-0;
+}
+
+.prose-custom a {
+  @apply text-primary underline transition-colors hover:text-primary/80;
+}
+
+/* Table styles */
+.prose-custom table {
+  @apply my-4 w-full border-collapse;
+}
+
+.prose-custom table th,
+.prose-custom table td {
+  @apply border border-border px-3 py-2 text-left;
+}
+
+.prose-custom table th {
+  @apply bg-muted font-semibold;
+}
+
+.prose-custom table tbody tr:nth-child(even) {
+  @apply bg-muted/30;
+}
+
+.prose-custom hr {
+  @apply my-6 border-t border-border;
+}
