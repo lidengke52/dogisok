@@ -46,13 +46,107 @@ values
     false
   ),
   (
-    'brushing-your-dog',
-    'How Often Should You Brush Your Dog?',
-    'Brushing frequency depends on your dog''s coat type. Here is a breakdown by breed group.',
-    'Regular brushing keeps your dog''s coat healthy and strengthens your bond. The right frequency depends on their coat type.\n\n## Short-Haired Breeds\n\nOnce a week is usually enough. Use a rubber brush or hound glove.\n\n## Long-Haired Breeds\n\nDaily brushing prevents mats and tangles. Use a slicker brush and wide-tooth comb.\n\n## Double-Coated Breeds\n\n2-3 times per week normally, daily during shedding seasons (spring/fall).',
-    '/images/article-grooming.jpg',
-    'grooming',
-    4,
+    'dog-breed-comparison-table',
+    'Dog Breed Comparison: Golden Retriever vs Labrador vs Poodle',
+    'A comprehensive comparison table of three popular dog breeds to help you choose the perfect companion.',
+    '# Dog Breed Comparison Guide
+
+This comprehensive table shows how three popular dog breeds compare across key characteristics to help you choose the right one for your lifestyle.
+
+## Breed Characteristics
+
+| Trait | Golden Retriever | Labrador Retriever | Standard Poodle |
+|-------|------------------|-------------------|-----------------|
+| **Size** | 55-75 lbs | 55-80 lbs | 45-70 lbs |
+| **Lifespan** | 10-12 years | 10-12 years | 12-15 years |
+| **Energy Level** | Very High | Very High | High |
+| **Trainability** | Excellent | Excellent | Excellent |
+| **Shedding** | Heavy | Heavy | Minimal |
+| **Grooming Need** | Moderate | Moderate | High (Professional) |
+| **Good with Kids** | Excellent | Excellent | Good |
+| **Good with Dogs** | Excellent | Excellent | Good |
+| **Barking Tendency** | Low | Low | Moderate |
+| **Apartment Friendly** | Moderate | Moderate | Good |
+
+## Detailed Comparison
+
+### Golden Retriever
+Golden Retrievers are renowned for their gentle nature and eagerness to please. They excel as family companions and service dogs due to their intelligence and calm temperament.
+
+**Pros:**
+- Extremely friendly and patient with children
+- Highly trainable for service and therapy work
+- Excellent swimmers with natural retrieving instinct
+- Consistent, predictable personality
+
+**Cons:**
+- Require extensive daily exercise
+- Heavy shedding year-round
+- Prone to hip dysplasia
+- Need significant socialization
+
+### Labrador Retriever
+Labs are America''s most popular dog breed for good reason. They combine athleticism, loyalty, and a fun-loving spirit.
+
+**Pros:**
+- Incredibly loyal and devoted family dogs
+- Versatile workers (service, therapy, search and rescue)
+- Durable and robust build
+- Eager to please and respond well to training
+
+**Cons:**
+- High exercise requirements
+- Significant shedding
+- Can become destructive if bored
+- Prone to obesity without proper exercise
+
+### Standard Poodle
+Poodles are highly intelligent and athletic dogs with minimal shedding coats.
+
+**Pros:**
+- Hypoallergenic coat (minimal shedding)
+- Highly intelligent - ranked 2nd in dog intelligence
+- Elegant appearance with various grooming options
+- Excellent in dog sports and competitions
+
+**Cons:**
+- Require professional grooming every 4-6 weeks
+- Expensive grooming costs
+- Can have hair not fur sensitivity
+- May be aloof with strangers
+
+## Which Breed Is Right For You?
+
+**Choose a Golden Retriever if:**
+- You want a gentle family dog that loves children
+- You have an active lifestyle with outdoor activities
+- You don''t mind regular grooming
+- You want a highly trainable and eager-to-please companion
+
+**Choose a Labrador if:**
+- You need a versatile working dog
+- You want a loyal, energetic companion
+- You have access to open spaces for running
+- You''re experienced with large, active dogs
+
+**Choose a Poodle if:**
+- You have allergies or prefer minimal shedding
+- You''re willing to invest in professional grooming
+- You want an intelligent, athletic dog
+- You enjoy dog sports or showing
+
+## Health Considerations
+
+All three breeds can live 10-15 years with proper care. Common health issues include:
+- **Hip Dysplasia** - all three breeds
+- **Eye Problems** - especially in Goldens
+- **Bloat** - large breed concern for all three
+- **Ear Infections** - especially in Retrievers with floppy ears
+
+Regular veterinary checkups and responsible breeding practices help minimize these risks.',
+    '/images/article-breed-comparison.jpg',
+    'knowledge',
+    12,
     true,
     false
   )
