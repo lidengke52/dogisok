@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -67,8 +67,8 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
 
   const [state, formAction, pending] = useActionState<ArticleFormState, FormData>(actionFn, {})
   
-  // Get subcategories for selected category
-  const selectedCategory = article?.category || "knowledge"
+  // Track selected category for dynamic subcategory display
+  const [selectedCategory, setSelectedCategory] = useState(article?.category || "knowledge")
   const categoryObj = CATEGORIES.find(c => c.value === selectedCategory)
   const subcategories = categoryObj?.subcategories || []
 
@@ -151,6 +151,7 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
                 id="category"
                 name="category"
                 defaultValue={article?.category ?? "knowledge"}
+                onChange={(e) => setSelectedCategory(e.target.value)}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {CATEGORIES.map((c) => (

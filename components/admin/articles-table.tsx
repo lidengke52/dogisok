@@ -55,6 +55,8 @@ export function ArticlesTable({ articles }: { articles: Row[] }) {
   const [query, setQuery] = useState("")
   const [confirmDelete, setConfirmDelete] = useState<Row | null>(null)
   const [pending, startTransition] = useTransition()
+  const [page, setPage] = useState(1)
+  const ITEMS_PER_PAGE = 10
 
   const filtered = useMemo(() => {
     return articles.filter((a) => {
@@ -67,6 +69,11 @@ export function ArticlesTable({ articles }: { articles: Row[] }) {
       return true
     })
   }, [articles, filter, query])
+
+  // 分页逻辑
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
+  const start = (page - 1) * ITEMS_PER_PAGE
+  const paged = filtered.slice(start, start + ITEMS_PER_PAGE)
 
   return (
     <div className="space-y-4">
@@ -119,88 +126,133 @@ export function ArticlesTable({ articles }: { articles: Row[] }) {
             </EmptyHeader>
           </Empty>
         ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>标题</TableHead>
-                <TableHead className="w-32">分类</TableHead>
-                <TableHead className="w-28">状态</TableHead>
-                <TableHead className="w-24">浏览量</TableHead>
-                <TableHead className="w-36">更新时间</TableHead>
-                <TableHead className="w-56 text-right">操作</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((a) => (
-                <TableRow key={a.id}>
-                  <TableCell className="font-medium">
-                    <div className="flex flex-col gap-0.5">
-                      <span className="line-clamp-1">{a.title}</span>
-                      <span className="font-mono text-xs text-muted-foreground">/{a.slug}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="capitalize">
-                      {a.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {a.published ? (
-                      <Badge className="gap-1 bg-primary/10 text-primary hover:bg-primary/20">
-                        <Eye className="h-3 w-3" /> 已发布
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="gap-1 text-muted-foreground">
-                        <EyeOff className="h-3 w-3" /> 草稿
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-sm tabular-nums">{a.views ?? 0}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {a.updated_at ? new Date(a.updated_at).toLocaleDateString() : "—"}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-end gap-1">
-                      {a.published && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="查看线上">
-                          <Link href={`/articles/${a.slug}`} target="_blank">
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-8"
-                        disabled={pending}
-                        onClick={() =>
-                          startTransition(async () => {
-                            await togglePublished(a.id, !a.published)
-                          })
-                        }
-                      >
-                        {a.published ? "取消发布" : "发布"}
-                      </Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="编辑">
-                        <Link href={`/admin/articles/${a.id}/edit`}>
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                        title="删除"
-                        onClick={() => setConfirmDelete(a)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>标题</TableHead>
+                    <TableHead className="w-32">分类</TableHead>
+                    <TableHead className="w-28">状态</TableHead>
+                    <TableHead className="w-24">浏览量</TableHead>
+                    <TableHead className="w-36">更新时间</TableHead>
+                    <TableHead className="w-40 text-right">操作</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paged.map((a) => (
+                    <TableRow key={a.id}>
+                      <TableCell className="font-medium min-w-0">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="line-clamp-2 break-words">{a.title}</span>
+                          <span className="font-mono text-xs text-muted-foreground">/{a.slug}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="capitalize">
+                          {a.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {a.published ? (
+                          <Badge className="gap-1 bg-primary/10 text-primary hover:bg-primary/20">
+                            <Eye className="h-3 w-3" /> 已发布
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="gap-1 text-muted-foreground">
+                            <EyeOff className="h-3 w-3" /> 草稿
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-sm tabular-nums">{a.views ?? 0}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {a.updated_at ? new Date(a.updated_at).toLocaleDateString() : "—"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1 flex-nowrap">
+                          {a.published && (
+                            <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="查看线上">
+                              <Link href={`/articles/${a.slug}`} target="_blank">
+                                <ExternalLink className="h-4 w-4" />
+                              </Link>
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 text-xs px-2"
+                            disabled={pending}
+                            onClick={() =>
+                              startTransition(async () => {
+                                await togglePublished(a.id, !a.published)
+                              })
+                            }
+                          >
+                            {a.published ? "取消发布" : "发布"}
+                          </Button>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="编辑">
+                            <Link href={`/admin/articles/${a.id}/edit`}>
+                              <Pencil className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            title="删除"
+                            onClick={() => setConfirmDelete(a)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            
+            {/* Pagination */}
+            <div className="flex items-center justify-between border-t border-border px-4 py-3">
+              <div className="text-sm text-muted-foreground">
+                共 {filtered.length} 篇，第 {page} / {totalPages} 页
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage(1)}
+                >
+                  首页
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                >
+                  上页
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                >
+                  下页
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={page === totalPages}
+                  onClick={() => setPage(totalPages)}
+                >
+                  末页
+                </Button>
+              </div>
+            </div>
+          </>
         )}
       </div>
 
