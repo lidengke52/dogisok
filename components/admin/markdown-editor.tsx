@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Eye, Pencil } from "lucide-react"
@@ -56,10 +57,10 @@ export function MarkdownEditor({ name, defaultValue = "", rows = 20 }: Props) {
         />
       ) : (
         <>
-          <div className="min-h-[400px] rounded-md border border-border bg-secondary/30 p-6">
+          <div className="min-h-[400px] rounded-md border border-border bg-secondary/30 p-6 overflow-x-auto">
             {value ? (
               <article className="prose-custom max-w-none text-sm leading-relaxed">
-                <ReactMarkdown>{value}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
               </article>
             ) : (
               <p className="text-sm text-muted-foreground">暂无内容可预览。</p>
