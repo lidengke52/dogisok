@@ -10,7 +10,9 @@ export const dynamic = "force-dynamic"
 
 export const metadata = { title: "文章管理 · 管理后台" }
 
-export default async function AdminArticlesPage() {
+export default async function AdminArticlesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page = "1" } = await searchParams
+  
   const supabase = await createClient()
   const {
     data: { user },
@@ -43,7 +45,7 @@ export default async function AdminArticlesPage() {
         </Button>
       </header>
 
-      <ArticlesTable articles={articles ?? []} />
+      <ArticlesTable articles={articles ?? []} page={page} />
     </div>
   )
 }

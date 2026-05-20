@@ -92,7 +92,7 @@ export async function createArticle(_prev: ArticleFormState, formData: FormData)
   redirect("/admin/articles")
 }
 
-export async function updateArticle(id: string, _prev: ArticleFormState, formData: FormData): Promise<ArticleFormState> {
+export async function updateArticle(id: string, page: string, _prev: ArticleFormState, formData: FormData): Promise<ArticleFormState> {
   try {
     const supabase = await assertAdmin()
     const payload = parsePayload(formData)
@@ -125,7 +125,7 @@ export async function updateArticle(id: string, _prev: ArticleFormState, formDat
 
   revalidatePath("/admin/articles")
   revalidatePath("/articles")
-  redirect("/admin/articles")
+  redirect(`/admin/articles?page=${page}`)
 }
 
 export async function togglePublished(id: string, nextState: boolean) {

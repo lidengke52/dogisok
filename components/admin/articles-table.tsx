@@ -50,12 +50,12 @@ const FILTERS = [
 
 type Filter = (typeof FILTERS)[number]["value"]
 
-export function ArticlesTable({ articles }: { articles: Row[] }) {
+export function ArticlesTable({ articles, page: initialPage = "1" }: { articles: Row[]; page?: string }) {
   const [filter, setFilter] = useState<Filter>("all")
   const [query, setQuery] = useState("")
   const [confirmDelete, setConfirmDelete] = useState<Row | null>(null)
   const [pending, startTransition] = useTransition()
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(parseInt(initialPage) || 1)
   const ITEMS_PER_PAGE = 10
 
   const filtered = useMemo(() => {
@@ -191,7 +191,7 @@ export function ArticlesTable({ articles }: { articles: Row[] }) {
                             {a.published ? "取消发布" : "发布"}
                           </Button>
                           <Button variant="ghost" size="icon" className="h-8 w-8" asChild title="编辑">
-                            <Link href={`/admin/articles/${a.id}/edit`}>
+                            <Link href={`/admin/articles/${a.id}/edit?page=${page}`}>
                               <Pencil className="h-4 w-4" />
                             </Link>
                           </Button>

@@ -14,10 +14,12 @@ export const metadata = { title: "编辑文章 · 管理后台" }
 
 type PageProps = {
   params: Promise<{ id: string }>
+  searchParams: Promise<{ page?: string }>
 }
 
-export default async function EditArticlePage({ params }: PageProps) {
+export default async function EditArticlePage({ params, searchParams }: PageProps) {
   const { id } = await params
+  const { page = "1" } = await searchParams
   const supabase = await createClient()
   const {
     data: { user },
@@ -52,7 +54,7 @@ export default async function EditArticlePage({ params }: PageProps) {
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <Button variant="ghost" size="sm" asChild className="-ml-2 mb-4">
-        <Link href="/admin/articles">
+        <Link href={`/admin/articles?page=${page}`}>
           <ArrowLeft className="mr-1 h-4 w-4" />
           返回文章列表
         </Link>
@@ -61,7 +63,7 @@ export default async function EditArticlePage({ params }: PageProps) {
         <h1 className="text-2xl font-semibold tracking-tight">编辑文章</h1>
         <p className="mt-1 font-mono text-xs text-muted-foreground">/{article.slug}</p>
       </div>
-      <ArticleForm mode="edit" articleId={id} article={article} breeds={breeds} />
+      <ArticleForm mode="edit" articleId={id} article={article} breeds={breeds} page={page} />
     </div>
   )
 }
