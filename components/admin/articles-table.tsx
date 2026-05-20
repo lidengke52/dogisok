@@ -33,6 +33,9 @@ type Row = {
   slug: string
   title: string
   category: string
+  subcategory: string | null
+  tags: string[] | null
+  breed_slug: string | null
   published: boolean
   views: number | null
   read_minutes: number | null
@@ -50,25 +53,38 @@ const FILTERS = [
 
 type Filter = (typeof FILTERS)[number]["value"]
 
-export function ArticlesTable({ articles, page: initialPage = "1" }: { articles: Row[]; page?: string }) {
-  const [filter, setFilter] = useState<Filter>("all")
+export function ArticlesTable({ articles, page: initialPage = "1", breeds = [] }: { articles: Row[]; page?: string; breeds?: Array<{ slug: string; name: string }> }) {
+  const [statusFilter, setStatusFilter] = useState<Filter>("all")
+  const [categoryFilter, setCategoryFilter] = useState("")
+  const [subcategoryFilter, setSubcategoryFilter] = useState("")
+  const [breedFilter, setBreedFilter] = useState("")
+  const [tagFilter, setTagFilter] = useState("")
   const [query, setQuery] = useState("")
   const [confirmDelete, setConfirmDelete] = useState<Row | null>(null)
   const [pending, startTransition] = useTransition()
   const [page, setPage] = useState(parseInt(initialPage) || 1)
   const ITEMS_PER_PAGE = 10
 
+  // 获取所有可用的分类、子分类和标签
+  const categories = [...new Set(articles.map(a => a.category))]
+  const getSubcategories = (cat: string) => [...new Set(articles.filter(a => a.category === cat).map(a => a.subcategory).filter(Boolean))]
+  const allTags = [...new Set(articles.flatMap(a => a.tags || []))]
+
   const filtered = useMemo(() => {
     return articles.filter((a) => {
-      if (filter === "published" && !a.published) return false
-      if (filter === "draft" && a.published) return false
+      if (statusFilter === "published" && !a.published) return false
+      if (statusFilter === "draft" && a.published) return false
+      if (categoryFilter && a.category !== categoryFilter) return false
+      if (subcategoryFilter && a.subcategory !== subcategoryFilter) return false
+      if (breedFilter && a.breed_slug !== breedFilter) return false
+      if (tagFilter && !(a.tags || []).includes(tagFilter)) return false
       if (query) {
         const q = query.toLowerCase()
         if (!a.title.toLowerCase().includes(q) && !a.slug.toLowerCase().includes(q)) return false
       }
       return true
     })
-  }, [articles, filter, query])
+  }, [articles, statusFilter, categoryFilter, subcategoryFilter, breedFilter, tagFilter, query])
 
   // 分页逻辑
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
@@ -77,6 +93,7 @@ export function ArticlesTable({ articles, page: initialPage = "1" }: { articles:
 
   return (
     <div className="space-y-4">
+      {/* 状态和搜索过滤 */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="inline-flex rounded-md border border-border bg-background p-0.5">
           {FILTERS.map((f) => {
@@ -90,8 +107,11 @@ export function ArticlesTable({ articles, page: initialPage = "1" }: { articles:
               <Button
                 key={f.value}
                 size="sm"
-                variant={filter === f.value ? "default" : "ghost"}
-                onClick={() => setFilter(f.value)}
+                variant={statusFilter === f.value ? "default" : "ghost"}
+                onClick={() => {
+                  setStatusFilter(f.value)
+                  setPage(1)
+                }}
                 className="h-8"
               >
                 {f.label} <span className="ml-1.5 text-xs opacity-70">{count}</span>
@@ -103,11 +123,101 @@ export function ArticlesTable({ articles, page: initialPage = "1" }: { articles:
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setPage(1)
+            }}
             placeholder="搜索标题或 slug..."
             className="pl-9"
           />
         </div>
+      </div>
+
+      {/* 高级筛选 */}
+      <div className="grid gap-2 rounded-lg border border-border bg-secondary/30 p-3 md:grid-cols-5 lg:grid-cols-5">
+        <select
+          value={categoryFilter}
+          onChange={(e) => {
+            setCategoryFilter(e.target.value)
+            setSubcategoryFilter("")
+            setPage(1)
+          }}
+          className="rounded border border-input bg-background px-2 py-1.5 text-xs"
+        >
+          <option value="">分类：全部</option>
+          {categories.map((cat) => (
+            <option key={cat} value={cat}>
+              分类：{cat}
+            </option>
+          ))}
+        </select>
+
+        {categoryFilter && getSubcategories(categoryFilter).length > 0 && (
+          <select
+            value={subcategoryFilter}
+            onChange={(e) => {
+              setSubcategoryFilter(e.target.value)
+              setPage(1)
+            }}
+            className="rounded border border-input bg-background px-2 py-1.5 text-xs"
+          >
+            <option value="">子分类：全部</option>
+            {getSubcategories(categoryFilter).map((subcat) => (
+              <option key={subcat} value={subcat}>
+                子分类：{subcat}
+              </option>
+            ))}
+          </select>
+        )}
+
+        <select
+          value={breedFilter}
+          onChange={(e) => {
+            setBreedFilter(e.target.value)
+            setPage(1)
+          }}
+          className="rounded border border-input bg-background px-2 py-1.5 text-xs"
+        >
+          <option value="">犬种：全部</option>
+          {breeds.map((breed) => (
+            <option key={breed.slug} value={breed.slug}>
+              {breed.name}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={tagFilter}
+          onChange={(e) => {
+            setTagFilter(e.target.value)
+            setPage(1)
+          }}
+          className="rounded border border-input bg-background px-2 py-1.5 text-xs"
+        >
+          <option value="">标签：全部</option>
+          {allTags.map((tag) => (
+            <option key={tag} value={tag}>
+              {tag}
+            </option>
+          ))}
+        </select>
+
+        {(categoryFilter || subcategoryFilter || breedFilter || tagFilter) && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setCategoryFilter("")
+              setSubcategoryFilter("")
+              setBreedFilter("")
+              setTagFilter("")
+              setPage(1)
+            }}
+            className="h-9 text-xs"
+          >
+            重置筛选
+          </Button>
+        )}
       </div>
 
       <div className="rounded-lg border border-border bg-card">

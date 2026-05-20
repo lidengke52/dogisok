@@ -20,10 +20,20 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
   if (!user) redirect("/admin/login")
   if (!(await isAdmin(user.id))) redirect("/")
 
-  const { data: articles } = await supabase
-    .from("articles")
-    .select("id, slug, title, category, published, views, read_minutes, published_at, updated_at, created_at, author")
-    .order("updated_at", { ascending: false })
+  const [articlesResult, breedsResult] = await Promise.all([
+    supabase
+      .from("articles")
+      .select("id, slug, title, category, subcategory, tags, breed_slug, published, views, read_minutes, published_at, updated_at, created_at, author")
+      .order("updated_at", { ascending: false }),
+    supabase
+      .from("breeds")
+      .select("slug, name")
+      .eq("published", true)
+      .order("name"),
+  ])
+
+  const articles = articlesResult.data ?? []
+  const breeds = breedsResult.data ?? []
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -45,7 +55,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
         </Button>
       </header>
 
-      <ArticlesTable articles={articles ?? []} page={page} />
+      <ArticlesTable articles={articles} page={page} breeds={breeds} />
     </div>
   )
 }
