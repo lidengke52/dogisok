@@ -158,12 +158,12 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       {previewSrc ? (
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">预览</Label>
-          <div className="relative w-full rounded-lg border border-border bg-muted overflow-hidden" style={{ aspectRatio: "16/9" }}>
+          <div className="relative w-full rounded-lg border border-border bg-muted overflow-hidden" style={{ aspectRatio: "1/1" }}>
             {/* 使用原生 img 标签避免 Next.js Image 域名限制问题 */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewSrc}
-              alt="封面图预览"
+              alt="广告图预览"
               className="h-full w-full object-cover"
               onError={() => { setError("图片加载失败，请检查 URL"); setPreviewSrc("") }}
             />
@@ -179,11 +179,11 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       ) : (
         <div
           className="flex items-center justify-center rounded-lg border border-dashed border-border bg-muted/30"
-          style={{ aspectRatio: "16/9" }}
+          style={{ aspectRatio: "1/1" }}
         >
           <div className="text-center text-muted-foreground">
             <ImageIcon className="mx-auto h-7 w-7 mb-1 opacity-30" />
-            <p className="text-xs">暂无封面图</p>
+            <p className="text-xs">暂无图片</p>
           </div>
         </div>
       )}

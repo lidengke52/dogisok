@@ -29,18 +29,15 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     // 去除空格和特殊字符，避免 Blob list() 路径匹配失败
     const safeName = file.name.replace(/\s+/g, "-").replace(/[^\w.\-]/g, "")
-    const filename = `breeds/${timestamp}-${safeName}`
+    const filename = `admin-uploads/${timestamp}-${safeName}`
 
     const blob = await put(filename, buffer, {
       access: "private",
       contentType: file.type,
     })
 
-    // 直接返回 blob URL，由前端通过 /api/image 代理访问
-    // 代理 URL 格式：/api/image/{blob.pathname}
-    const imageUrl = `/api/image/${blob.pathname}`
-
-    return NextResponse.json({ url: imageUrl })
+    // 返回完整的 blob URL（http(s) 格式）供数据库存储
+    return NextResponse.json({ url: blob.url })
   } catch (error) {
     console.error("[v0] Image upload error:", error)
     return NextResponse.json(

@@ -85,7 +85,7 @@ export function ProductAdForm({ ad }: Props) {
         <Field>
           <FieldLabel>图片</FieldLabel>
           <ImageUploader name="image_url" defaultValue={ad?.image_url ?? ""} />
-          <FieldDescription>选填。建议尺寸 800×600。留空则使用默认占位图标。</FieldDescription>
+          <FieldDescription>选填。建议尺寸 1:1 正方形（如 800×800）。留空则使用默认占位图标。</FieldDescription>
         </Field>
 
         <Field orientation="horizontal">
