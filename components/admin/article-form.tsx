@@ -40,6 +40,8 @@ type Props = {
   article?: Article
   /** 用于"关联犬种"下拉的可选品种列表（只传已发布的） */
   breeds?: BreedOption[]
+  /** 分页页码，用于保存后返回同一页 */
+  page?: string
 }
 
 const CATEGORIES = [
@@ -58,11 +60,11 @@ const CATEGORIES = [
   { value: "health", label: "健康", subcategories: [] },
 ]
 
-export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
-  // Bind articleId for edit mode, otherwise use createArticle directly.
+export function ArticleForm({ mode, articleId, article, breeds = [], page = "1" }: Props) {
+  // Bind articleId and page for edit mode, otherwise use createArticle directly.
   const actionFn =
     mode === "edit" && articleId
-      ? (prev: ArticleFormState, formData: FormData) => updateArticle(articleId, prev, formData)
+      ? (prev: ArticleFormState, formData: FormData) => updateArticle(articleId, page, prev, formData)
       : createArticle
 
   const [state, formAction, pending] = useActionState<ArticleFormState, FormData>(actionFn, {})
@@ -76,7 +78,7 @@ export function ArticleForm({ mode, articleId, article, breeds = [] }: Props) {
     <form action={formAction} className="space-y-6">
       <div className="flex items-center justify-between">
         <Button type="button" variant="ghost" size="sm" className="gap-1.5" asChild>
-          <Link href="/admin/articles">
+          <Link href={`/admin/articles?page=${page}`}>
             <ArrowLeft className="h-4 w-4" /> 返回文章列表
           </Link>
         </Button>

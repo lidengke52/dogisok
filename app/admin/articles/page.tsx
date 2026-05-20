@@ -10,7 +10,9 @@ export const dynamic = "force-dynamic"
 
 export const metadata = { title: "文章管理 · 管理后台" }
 
-export default async function AdminArticlesPage() {
+export default async function AdminArticlesPage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
+  const { page = "1" } = await searchParams
+  
   const supabase = await createClient()
   const {
     data: { user },
@@ -18,10 +20,20 @@ export default async function AdminArticlesPage() {
   if (!user) redirect("/admin/login")
   if (!(await isAdmin(user.id))) redirect("/")
 
-  const { data: articles } = await supabase
-    .from("articles")
-    .select("id, slug, title, category, published, views, read_minutes, published_at, updated_at, created_at, author")
-    .order("updated_at", { ascending: false })
+  const [articlesResult, breedsResult] = await Promise.all([
+    supabase
+      .from("articles")
+      .select("id, slug, title, category, subcategory, tags, breed_slug, published, views, read_minutes, published_at, updated_at, created_at, author")
+      .order("updated_at", { ascending: false }),
+    supabase
+      .from("breeds")
+      .select("slug, name")
+      .eq("published", true)
+      .order("name"),
+  ])
+
+  const articles = articlesResult.data ?? []
+  const breeds = breedsResult.data ?? []
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -43,7 +55,7 @@ export default async function AdminArticlesPage() {
         </Button>
       </header>
 
-      <ArticlesTable articles={articles ?? []} />
+      <ArticlesTable articles={articles} page={page} breeds={breeds} />
     </div>
   )
 }
