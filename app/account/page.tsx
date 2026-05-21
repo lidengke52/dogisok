@@ -38,7 +38,7 @@ export default async function AccountPage() {
   const displayName = profile?.display_name || user.email?.split("@")[0] || "Friend"
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col overflow-x-hidden">
       <SiteHeader />
 
       <main className="flex-1 bg-secondary/30">
