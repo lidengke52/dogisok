@@ -45,7 +45,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="h-4 w-4" />
-              All articles
+              Back to articles
             </Link>
 
             <div className="mt-6 flex flex-wrap items-center gap-2">

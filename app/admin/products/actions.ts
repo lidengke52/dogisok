@@ -82,6 +82,10 @@ export async function updateProduct(
 
 export async function deleteProduct(id: string) {
   const supabase = await ensureAdmin()
+  // 先删除关联的 product_claims 记录，再删除 product
+  const { error: claimsError } = await supabase.from("product_claims").delete().eq("product_id", id)
+  if (claimsError) throw new Error(claimsError.message)
+  
   const { error } = await supabase.from("products").delete().eq("id", id)
   if (error) throw new Error(error.message)
   revalidatePath("/admin/products")
@@ -91,6 +95,10 @@ export async function deleteProduct(id: string) {
 export async function deleteProductsBulk(ids: string[]) {
   if (!ids.length) throw new Error("No items selected")
   const supabase = await ensureAdmin()
+  // 先删除关联的 product_claims 记录，再删除 products
+  const { error: claimsError } = await supabase.from("product_claims").delete().in("product_id", ids)
+  if (claimsError) throw new Error(claimsError.message)
+  
   const { error } = await supabase.from("products").delete().in("id", ids)
   if (error) throw new Error(error.message)
   revalidatePath("/admin/products")
