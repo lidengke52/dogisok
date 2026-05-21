@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { Upload, X, Link as LinkIcon, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,13 +16,26 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
   const [tab, setTab] = useState<"upload" | "url">(defaultValue ? "url" : "upload")
   // savedUrl: 最终写入数据库的值（Blob URL 或外部 URL）
   const [savedUrl, setSavedUrl] = useState(defaultValue)
-  // previewSrc: 仅用于 <img> 展示，本地上传时使用 objectURL 无需代理
+  // previewSrc: 仅用于 <img> 展示
   const [previewSrc, setPreviewSrc] = useState(defaultValue)
   const [urlInput, setUrlInput] = useState(defaultValue)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 当编辑现有广告时，defaultValue 存在，此时需要确保已保存的 URL 立即可用
+  const hasDefaultValue = defaultValue && defaultValue.trim().length > 0
+
+  // 当 defaultValue 变化时（比如切换编辑的广告），同步更新所有状态
+  useEffect(() => {
+    if (defaultValue && defaultValue.trim().length > 0) {
+      setSavedUrl(defaultValue)
+      setPreviewSrc(defaultValue)
+      setUrlInput(defaultValue)
+      setTab("url")
+    }
+  }, [defaultValue])
 
   const upload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -43,9 +56,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
     try {
       const form = new FormData()
       form.append("file", file)
-      console.log("[v0] Starting upload for:", file.name)
       const res = await fetch("/api/upload", { method: "POST", body: form })
-      console.log("[v0] Upload response status:", res.status)
       
       if (!res.ok) {
         let errorMsg = `Upload failed (${res.status})`
@@ -60,7 +71,6 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       }
       
       const { url } = await res.json()
-      console.log("[v0] Received URL:", url)
       
       if (!url || typeof url !== "string") {
         throw new Error("Server returned invalid URL: " + JSON.stringify(url))
@@ -76,11 +86,9 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       // 上传完成后保存 URL
       setSavedUrl(url)
       setPreviewSrc(url)
-      console.log("[v0] Upload successful")
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed"
       setError(msg)
-      console.log("[v0] Upload error:", msg)
       // 上传失败时恢复预览为已保存的 URL
       setPreviewSrc(savedUrl)
     } finally {
@@ -164,18 +172,23 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
 
       {/* URL 输入区域 */}
       {tab === "url" && (
-        <div className="flex gap-2">
-          <Input
-            type="url"
-            placeholder="https://example.com/dog.jpg"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmUrl() } }}
-            className="font-mono text-xs"
-          />
-          <Button type="button" variant="outline" onClick={confirmUrl} disabled={!urlInput.trim()}>
-            确认
-          </Button>
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-2">
+            <Input
+              type="url"
+              placeholder="https://example.com/dog.jpg"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmUrl() } }}
+              className="font-mono text-xs"
+            />
+            <Button type="button" variant="outline" onClick={confirmUrl} disabled={!urlInput.trim()}>
+              确认
+            </Button>
+          </div>
+          {hasDefaultValue && savedUrl === defaultValue && (
+            <p className="text-xs text-muted-foreground">当前已保存的图片 URL（编辑此字段可更换图片）</p>
+          )}
         </div>
       )}
 
