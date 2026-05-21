@@ -44,14 +44,14 @@ export default async function AccountPage() {
       <main className="flex-1 bg-secondary/30">
         <section className="border-b border-border bg-background">
           <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-6 md:py-10 lg:px-8">
-            <div className="flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <PawPrint className="h-7 w-7" aria-hidden="true" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">Welcome back</p>
-                <h1 className="text-2xl font-semibold tracking-tight">{displayName}</h1>
-                <p className="text-sm text-muted-foreground">{user.email}</p>
+                <h1 className="truncate text-2xl font-semibold tracking-tight">{displayName}</h1>
+                <p className="truncate text-sm text-muted-foreground">{user.email}</p>
               </div>
             </div>
             <form action={signOut}>
