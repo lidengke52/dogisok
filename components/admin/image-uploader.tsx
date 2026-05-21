@@ -12,31 +12,28 @@ interface Props {
   defaultValue?: string
 }
 
-/** 判断一个字符串是否是可展示的图片地址（外链或本地代理路径） */
-function isImageUrl(v: string) {
-  if (!v || !v.trim()) return false
-  // 支持 http(s):// 外链 或 /api/image/... 代理路径
-  return v.startsWith("http://") || v.startsWith("https://") || v.startsWith("/api/image/")
-}
-
 export function ImageUploader({ name, defaultValue = "" }: Props) {
-  const [tab, setTab] = useState<"upload" | "url">(isImageUrl(defaultValue) ? "url" : "upload")
-  // savedUrl: 最终写入数据库的值（代理路径或外部 URL）
+  const [tab, setTab] = useState<"upload" | "url">("upload")
   const [savedUrl, setSavedUrl] = useState(defaultValue)
-  // previewSrc: 仅用于 <img> 展示
   const [previewSrc, setPreviewSrc] = useState(defaultValue)
-  const [urlInput, setUrlInput] = useState(isImageUrl(defaultValue) ? defaultValue : "")
+  const [urlInput, setUrlInput] = useState("")
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 当 defaultValue 变化时（例如页面跳转到另一条广告的编辑页），同步所有状态
+  // 当 defaultValue 变化时同步（编辑模式页面初始化 / 切换不同条目）
   useEffect(() => {
     setSavedUrl(defaultValue)
     setPreviewSrc(defaultValue)
-    setUrlInput(isImageUrl(defaultValue) ? defaultValue : "")
-    setTab(isImageUrl(defaultValue) ? "url" : "upload")
+    // 有已保存图片时，切到 URL tab 并显示当前值，方便用户看到和修改
+    if (defaultValue) {
+      setTab("url")
+      setUrlInput(defaultValue)
+    } else {
+      setTab("upload")
+      setUrlInput("")
+    }
   }, [defaultValue])
 
   const upload = async (file: File) => {
@@ -51,38 +48,27 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
     setError("")
     setUploading(true)
 
-    // 立即用 objectURL 显示本地预览，上传期间不依赖网络
-    const localUrl = URL.createObjectURL(file)
-    setPreviewSrc(localUrl)
+    // 立即用 objectURL 预览，不等待网络
+    const localPreview = URL.createObjectURL(file)
+    setPreviewSrc(localPreview)
 
     try {
       const form = new FormData()
       form.append("file", file)
       const res = await fetch("/api/upload", { method: "POST", body: form })
-      
       if (!res.ok) {
-        let errorMsg = `上传失败 (${res.status})`
-        try {
-          const data = await res.json()
-          errorMsg = data.error || errorMsg
-        } catch {
-          // ignore parse error
-        }
-        throw new Error(errorMsg)
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || `上传失败 (${res.status})`)
       }
-      
       const { url } = await res.json()
-      
-      if (!url || typeof url !== "string") {
-        throw new Error("服务器返回了无效的 URL")
-      }
-      
-      // savedUrl 存代理路径，提交给表单；previewSrc 保持 objectURL 让用户看到本地预览
+      if (!url) throw new Error("服务器未返回 URL")
+
+      // 将服务器返回的持久化 URL 写入 savedUrl（会同步到 hidden input）
       setSavedUrl(url)
-      // 切到上传 tab 后，预览保持 objectURL 不变（不切到 url tab）
+      // 预览保持 objectURL，用户可以立即看到图片
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "上传失败"
-      setError(msg)
+      setError(err instanceof Error ? err.message : "上传失败")
+      // 上传失败时恢复预览
       setPreviewSrc(savedUrl)
     } finally {
       setUploading(false)
@@ -151,7 +137,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
           <Upload className="h-7 w-7 text-muted-foreground" />
           <div>
             <p className="text-sm font-medium">{uploading ? "上传中..." : "拖拽图片到此，或点击选择"}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">支持 JPG、PNG、WebP，最大 5MB</p>
+            <p className="text-xs text-muted-foreground mt-0.5">支持 JPG、PNG、WebP，最大 5MB，推荐 1:1 比例</p>
           </div>
           <input
             ref={fileInputRef}
@@ -168,7 +154,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
         <div className="flex gap-2">
           <Input
             type="url"
-            placeholder="https://example.com/dog.jpg"
+            placeholder="https://example.com/image.jpg"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmUrl() } }}
@@ -188,11 +174,10 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">预览</Label>
           <div className="relative w-full rounded-lg border border-border bg-muted overflow-hidden" style={{ aspectRatio: "1/1" }}>
-            {/* 使用原生 img 标签避免 Next.js Image 域名限制问题 */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewSrc}
-              alt="广告图预览"
+              alt="图片预览"
               className="h-full w-full object-contain"
             />
             <button
@@ -216,7 +201,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
         </div>
       )}
 
-      {/* 存储最终 URL，供 form action 提交使用 */}
+      {/* 提交给 form action 的隐藏字段 */}
       <input type="hidden" name={name} value={savedUrl} />
     </div>
   )
