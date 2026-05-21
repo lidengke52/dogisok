@@ -111,7 +111,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
 
           {article.cover_image && (
             <div className="mx-auto mt-10 max-w-5xl px-4 md:px-6 lg:px-8">
-              <div className="relative aspect-[16/9] overflow-hidden rounded-2xl border border-border">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-border">
                 <Image
                   src={article.cover_image || "/placeholder.svg"}
                   alt={article.title}

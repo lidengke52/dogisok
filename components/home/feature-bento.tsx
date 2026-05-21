@@ -8,7 +8,7 @@ const features = [
     subtitle: "Food safety guide",
     description:
       "Search 500+ foods with veterinarian-approved verdicts: safe, caution, or do not feed. Covers portion guidance and warning signs.",
-    href: "/articles?category=can-eat",
+    href: "/articles?category=food&subcategory=safe",
     icon: Apple,
     tone: "primary",
     size: "lg",
@@ -19,7 +19,7 @@ const features = [
     title: "Can They Do It?",
     subtitle: "Activity & safety",
     description: "Travel, grooming, home life, and clothing — practical answers before you try something new.",
-    href: "/articles?category=can-do",
+    href: "/articles?category=behavior&subcategory=safe",
     icon: Activity,
     tone: "accent",
     size: "md",
