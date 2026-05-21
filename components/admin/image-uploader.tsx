@@ -51,7 +51,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
     setError("")
     setUploading(true)
 
-    // 立即用 objectURL 显示预览，不依赖网络
+    // 立即用 objectURL 显示本地预览，上传期间不依赖网络
     const localUrl = URL.createObjectURL(file)
     setPreviewSrc(localUrl)
 
@@ -61,13 +61,12 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       const res = await fetch("/api/upload", { method: "POST", body: form })
       
       if (!res.ok) {
-        let errorMsg = `Upload failed (${res.status})`
+        let errorMsg = `上传失败 (${res.status})`
         try {
           const data = await res.json()
           errorMsg = data.error || errorMsg
-        } catch (e) {
-          const text = await res.text()
-          console.log("[v0] Response body:", text)
+        } catch {
+          // ignore parse error
         }
         throw new Error(errorMsg)
       }
@@ -75,23 +74,15 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       const { url } = await res.json()
       
       if (!url || typeof url !== "string") {
-        throw new Error("Server returned invalid URL: " + JSON.stringify(url))
+        throw new Error("服务器返回了无效的 URL")
       }
       
-      // 验证返回的 URL 是否有效
-      try {
-        new URL(url)
-      } catch {
-        throw new Error("Invalid URL format: " + url)
-      }
-      
-      // 上传完成后保存 URL
+      // savedUrl 存代理路径，提交给表单；previewSrc 保持 objectURL 让用户看到本地预览
       setSavedUrl(url)
-      setPreviewSrc(url)
+      // 切到上传 tab 后，预览保持 objectURL 不变（不切到 url tab）
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Upload failed"
+      const msg = err instanceof Error ? err.message : "上传失败"
       setError(msg)
-      // 上传失败时恢复预览为已保存的 URL
       setPreviewSrc(savedUrl)
     } finally {
       setUploading(false)
@@ -203,7 +194,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
               src={previewSrc}
               alt="广告图预览"
               className="h-full w-full object-cover"
-              onError={() => { setError("图片加载失败，请检查 URL"); setPreviewSrc("") }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
             />
             <button
               type="button"
