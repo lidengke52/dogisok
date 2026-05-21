@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useTransition } from "react"
-import { ExternalLink, Pencil, Trash2 } from "lucide-react"
+import { useTransition, useState } from "react"
+import { ExternalLink, Pencil, Trash2, Filter, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { deleteProductAd, toggleProductAd } from "@/app/admin/product-ads/actions"
 import type { ProductAd } from "@/lib/product-ads"
@@ -15,6 +15,13 @@ const PLACEMENT_LABEL: Record<ProductAd["placement"], string> = {
 
 export function ProductAdsTable({ ads }: { ads: ProductAd[] }) {
   const [isPending, startTransition] = useTransition()
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all")
+
+  const filtered = ads.filter((ad) => {
+    if (statusFilter === "active") return ad.is_active
+    if (statusFilter === "inactive") return !ad.is_active
+    return true
+  })
 
   if (ads.length === 0) {
     return (
@@ -25,22 +32,50 @@ export function ProductAdsTable({ ads }: { ads: ProductAd[] }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="bg-secondary/40 text-left">
-            <tr>
-              <th className="px-4 py-3 font-semibold">标题</th>
-              <th className="px-4 py-3 font-semibold">投放位置</th>
-              <th className="px-4 py-3 font-semibold">排序</th>
-              <th className="px-4 py-3 font-semibold">状态</th>
-              <th className="px-4 py-3 font-semibold">链接</th>
-              <th className="px-4 py-3 text-right font-semibold">操作</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {ads.map((ad) => (
-              <tr key={ad.id} className="align-top">
+    <div className="space-y-4">
+      {/* 筛选栏 */}
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant={statusFilter === "all" ? "default" : "outline"}
+          onClick={() => setStatusFilter("all")}
+          className="gap-1.5"
+        >
+          <Filter className="h-4 w-4" />
+          全部 ({ads.length})
+        </Button>
+        <Button
+          size="sm"
+          variant={statusFilter === "active" ? "default" : "outline"}
+          onClick={() => setStatusFilter("active")}
+        >
+          显示中 ({ads.filter((a) => a.is_active).length})
+        </Button>
+        <Button
+          size="sm"
+          variant={statusFilter === "inactive" ? "default" : "outline"}
+          onClick={() => setStatusFilter("inactive")}
+        >
+          已隐藏 ({ads.filter((a) => !a.is_active).length})
+        </Button>
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-secondary/40 text-left">
+              <tr>
+                <th className="px-4 py-3 font-semibold">标题</th>
+                <th className="px-4 py-3 font-semibold">投放位置</th>
+                <th className="px-4 py-3 font-semibold">排序</th>
+                <th className="px-4 py-3 font-semibold">状态</th>
+                <th className="px-4 py-3 font-semibold">链接</th>
+                <th className="px-4 py-3 text-right font-semibold">操作</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {filtered.map((ad) => (
+                <tr key={ad.id} className="align-top">
                 <td className="px-4 py-3">
                   <p className="font-medium text-foreground">{ad.title}</p>
                   {ad.description ? (
@@ -105,10 +140,17 @@ export function ProductAdsTable({ ads }: { ads: ProductAd[] }) {
                   </div>
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
+      
+      {filtered.length === 0 && ads.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center text-sm text-muted-foreground">
+          没有符合筛选条件的广告。
+        </div>
+      )}
     </div>
   )
 }

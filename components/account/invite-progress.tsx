@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useMemo, useState } from "react"
-import { Copy, Check, Share2, Gift, Facebook, Twitter, MessageCircle, Mail } from "lucide-react"
+import { Copy, Check, Share2, Gift, Facebook, Twitter, MessageCircle, Mail, Instagram } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function InviteProgress({
@@ -44,6 +44,14 @@ export function InviteProgress({
         icon: Facebook,
         href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(inviteLink)}&quote=${encodeURIComponent(shareText)}`,
         color: "hover:text-[#1877F2]",
+      },
+      {
+        name: "Instagram",
+        icon: Instagram,
+        href: `https://www.instagram.com/`,
+        color: "hover:text-[#E4405F]",
+        external: true,
+        title: "Share via Instagram (open app and share)",
       },
       {
         name: "WhatsApp",
@@ -172,6 +180,7 @@ export function InviteProgress({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Share via ${s.name}`}
+                  title={s.title}
                   className={`flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition-colors ${s.color}`}
                 >
                   <Icon className="h-4 w-4" />

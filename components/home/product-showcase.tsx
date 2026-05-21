@@ -24,14 +24,14 @@ export async function ProductShowcase() {
               href={`/products/${product.id}`}
               className="group relative overflow-hidden rounded-xl bg-secondary transition-all hover:shadow-lg"
             >
-              <div className="aspect-video overflow-hidden bg-muted">
+              <div className="aspect-square overflow-hidden bg-muted">
                 {product.image_url && (
                   <Image
                     src={product.image_url}
                     alt={product.name}
                     width={400}
-                    height={300}
-                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    height={400}
+                    className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-105"
                   />
                 )}
               </div>

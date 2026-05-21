@@ -63,7 +63,7 @@ export default async function AccountPage() {
         </section>
 
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 md:px-6 md:py-10 lg:grid-cols-3 lg:px-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <InviteProgress
               inviteCode={inviteStats.invite_code}
               totalInvited={Number(inviteStats.verified_invited ?? 0)}

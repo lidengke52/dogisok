@@ -53,7 +53,6 @@ function parsePayload(formData: FormData) {
   if (!title) throw new Error("Title is required")
   if (!link_url || !isValidUrl(link_url)) throw new Error("A valid http(s) link URL is required")
   if (!isValidPlacement(placement)) throw new Error("Placement must be home, articles, or consultation")
-  if (image_url && !isValidUrl(image_url)) throw new Error("Image URL must be a valid http(s) URL")
 
   return {
     title,
@@ -101,15 +100,17 @@ export async function updateProductAd(
 
 export async function deleteProductAd(id: string) {
   const supabase = await assertAdmin()
-  await supabase.from("product_ads").delete().eq("id", id)
+  const { error } = await supabase.from("product_ads").delete().eq("id", id)
+  if (error) throw new Error(error.message)
   revalidateAll()
 }
 
 export async function toggleProductAd(id: string, nextState: boolean) {
   const supabase = await assertAdmin()
-  await supabase
+  const { error } = await supabase
     .from("product_ads")
     .update({ is_active: nextState, updated_at: new Date().toISOString() })
     .eq("id", id)
+  if (error) throw new Error(error.message)
   revalidateAll()
 }

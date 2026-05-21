@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { Upload, X, Link as LinkIcon, ImageIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,15 +14,27 @@ interface Props {
 
 export function ImageUploader({ name, defaultValue = "" }: Props) {
   const [tab, setTab] = useState<"upload" | "url">("upload")
-  // savedUrl: 最终写入数据库的值（Blob URL 或外部 URL）
   const [savedUrl, setSavedUrl] = useState(defaultValue)
-  // previewSrc: 仅用于 <img> 展示，本地上传时使用 objectURL 无需代理
   const [previewSrc, setPreviewSrc] = useState(defaultValue)
-  const [urlInput, setUrlInput] = useState(defaultValue)
+  const [urlInput, setUrlInput] = useState("")
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // 当 defaultValue 变化时同步（编辑模式页面初始化 / 切换不同条目）
+  useEffect(() => {
+    setSavedUrl(defaultValue)
+    setPreviewSrc(defaultValue)
+    // 有已保存图片时，切到 URL tab 并显示当前值，方便用户看到和修改
+    if (defaultValue) {
+      setTab("url")
+      setUrlInput(defaultValue)
+    } else {
+      setTab("upload")
+      setUrlInput("")
+    }
+  }, [defaultValue])
 
   const upload = async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -36,9 +48,9 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
     setError("")
     setUploading(true)
 
-    // 立即用 objectURL 显示预览，不依赖网络
-    const localUrl = URL.createObjectURL(file)
-    setPreviewSrc(localUrl)
+    // 立即用 objectURL 预览，不等待网络
+    const localPreview = URL.createObjectURL(file)
+    setPreviewSrc(localPreview)
 
     try {
       const form = new FormData()
@@ -46,14 +58,17 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       const res = await fetch("/api/upload", { method: "POST", body: form })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "上传失败")
+        throw new Error(data.error || `上传失败 (${res.status})`)
       }
       const { url } = await res.json()
-      // 上传完成后 savedUrl 改为 Blob 地址（用于保存到数据库）
-      // previewSrc 保持 objectURL 不变，预览继续正常显示
+      if (!url) throw new Error("服务器未返回 URL")
+
+      // 将服务器返回的持久化 URL 写入 savedUrl（会同步到 hidden input）
       setSavedUrl(url)
+      // 预览保持 objectURL，用户可以立即看到图片
     } catch (err) {
       setError(err instanceof Error ? err.message : "上传失败")
+      // 上传失败时恢复预览
       setPreviewSrc(savedUrl)
     } finally {
       setUploading(false)
@@ -122,7 +137,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
           <Upload className="h-7 w-7 text-muted-foreground" />
           <div>
             <p className="text-sm font-medium">{uploading ? "上传中..." : "拖拽图片到此，或点击选择"}</p>
-            <p className="text-xs text-muted-foreground mt-0.5">支持 JPG、PNG、WebP，最大 5MB</p>
+            <p className="text-xs text-muted-foreground mt-0.5">支持 JPG、PNG、WebP，最大 5MB，推荐 1:1 比例</p>
           </div>
           <input
             ref={fileInputRef}
@@ -139,7 +154,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
         <div className="flex gap-2">
           <Input
             type="url"
-            placeholder="https://example.com/dog.jpg"
+            placeholder="https://example.com/image.jpg"
             value={urlInput}
             onChange={(e) => setUrlInput(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmUrl() } }}
@@ -158,14 +173,12 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       {previewSrc ? (
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">预览</Label>
-          <div className="relative w-full rounded-lg border border-border bg-muted overflow-hidden" style={{ aspectRatio: "16/9" }}>
-            {/* 使用原生 img 标签避免 Next.js Image 域名限制问题 */}
+          <div className="relative w-full rounded-lg border border-border bg-muted overflow-hidden" style={{ aspectRatio: "1/1" }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewSrc}
-              alt="封面图预览"
-              className="h-full w-full object-cover"
-              onError={() => { setError("图片加载失败，请检查 URL"); setPreviewSrc("") }}
+              alt="图片预览"
+              className="h-full w-full object-contain"
             />
             <button
               type="button"
@@ -179,16 +192,16 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       ) : (
         <div
           className="flex items-center justify-center rounded-lg border border-dashed border-border bg-muted/30"
-          style={{ aspectRatio: "16/9" }}
+          style={{ aspectRatio: "1/1" }}
         >
           <div className="text-center text-muted-foreground">
             <ImageIcon className="mx-auto h-7 w-7 mb-1 opacity-30" />
-            <p className="text-xs">暂无封面图</p>
+            <p className="text-xs">暂无图片</p>
           </div>
         </div>
       )}
 
-      {/* 存储最终 URL，供 form action 提交使用 */}
+      {/* 提交给 form action 的隐藏字段 */}
       <input type="hidden" name={name} value={savedUrl} />
     </div>
   )

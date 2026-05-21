@@ -140,7 +140,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
                       : "border-border bg-background text-foreground hover:border-primary/40 hover:bg-primary/5"
                   }`}
                 >
-                  All
+                  All Subcategories
                 </Link>
                 {subcategoryOptions.map((opt) => {
                   const active = opt.slug === subcategory
