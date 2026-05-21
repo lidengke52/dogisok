@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { ArticleCard } from "@/components/article-card"
 import { ProductAdSlot } from "@/components/ads/product-ad-card"
-import { Button } from "@/components/ui/button"
+import { ArticleShareButtons } from "@/components/articles/article-share-buttons"
 import { getArticleBySlug, listRelated, toCardArticle, listRandomArticles } from "@/lib/articles"
 import { getProductAdsByPlacement } from "@/lib/product-ads"
 
@@ -104,51 +104,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
                   </p>
                 </div>
               </div>
-
-            <div className="flex items-center gap-1.5">
-              <span className="mr-2 text-xs text-muted-foreground">Share</span>
-              <a
-                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://dogisok.com/articles/${slug}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
-                aria-label="Share on Facebook"
-              >
-                <Facebook className="h-4 w-4" />
-              </a>
-              <a
-                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://dogisok.com/articles/${slug}`)}&text=${encodeURIComponent(article.title)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
-                aria-label="Share on Twitter"
-              >
-                <Twitter className="h-4 w-4" />
-              </a>
-              <a
-                href={`https://www.instagram.com/`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
-                aria-label="Follow on Instagram"
-                title="Follow us on Instagram"
-              >
-                <Instagram className="h-4 w-4" />
-              </a>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => {
-                  const url = `https://dogisok.com/articles/${slug}`
-                  if (navigator.clipboard) {
-                    navigator.clipboard.writeText(url)
-                  }
-                }}
-                aria-label="Copy link"
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
+              <ArticleShareButtons slug={slug} title={article.title} />
             </div>
           </div>
 
