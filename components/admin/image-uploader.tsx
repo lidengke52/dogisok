@@ -193,8 +193,7 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
             <img
               src={previewSrc}
               alt="广告图预览"
-              className="h-full w-full object-cover"
-              onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
+              className="h-full w-full object-contain"
             />
             <button
               type="button"

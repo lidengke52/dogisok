@@ -32,12 +32,6 @@ function isValidUrl(value: string): boolean {
   }
 }
 
-/** 接受 http(s) 外链或 /api/image/... 本地代理路径 */
-function isValidImageUrl(value: string): boolean {
-  if (!value) return false
-  return isValidUrl(value) || value.startsWith("/api/image/")
-}
-
 function revalidateAll() {
   revalidatePath("/admin/product-ads")
   revalidatePath("/")
@@ -59,7 +53,6 @@ function parsePayload(formData: FormData) {
   if (!title) throw new Error("Title is required")
   if (!link_url || !isValidUrl(link_url)) throw new Error("A valid http(s) link URL is required")
   if (!isValidPlacement(placement)) throw new Error("Placement must be home, articles, or consultation")
-  if (image_url && !isValidImageUrl(image_url)) throw new Error("Image URL must be a valid http(s) URL or /api/image/ path")
 
   return {
     title,
