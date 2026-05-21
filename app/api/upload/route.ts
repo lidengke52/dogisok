@@ -31,29 +31,14 @@ export async function POST(request: NextRequest) {
     const safeName = file.name.replace(/\s+/g, "-").replace(/[^\w.\-]/g, "")
     const filename = `admin-uploads/${timestamp}-${safeName}`
 
-    console.log("[v0] Uploading:", filename, "size:", buffer.byteLength)
-
     const blob = await put(filename, buffer, {
       access: "private",
       contentType: file.type,
     })
 
-    console.log("[v0] Upload complete, URL:", blob.url)
-
-    // 验证返回的 URL
-    if (!blob.url) {
-      throw new Error("Blob returned no URL")
-    }
-
-    try {
-      new URL(blob.url)
-    } catch {
-      console.error("[v0] Invalid URL from Blob:", blob.url)
-      throw new Error("Invalid URL format from Blob: " + blob.url)
-    }
-
-    // 返回完整的 blob URL（http(s) 格式）供数据库存储
-    return NextResponse.json({ url: blob.url })
+    // 私有 Blob 需要通过 /api/image 代理访问，存代理路径到数据库
+    const proxyUrl = `/api/image/${blob.pathname}`
+    return NextResponse.json({ url: proxyUrl })
   } catch (error) {
     console.error("[v0] Image upload error:", error)
     const message = error instanceof Error ? error.message : "Upload failed"

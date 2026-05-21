@@ -12,29 +12,31 @@ interface Props {
   defaultValue?: string
 }
 
+/** 判断一个字符串是否是可展示的图片地址（外链或本地代理路径） */
+function isImageUrl(v: string) {
+  if (!v || !v.trim()) return false
+  // 支持 http(s):// 外链 或 /api/image/... 代理路径
+  return v.startsWith("http://") || v.startsWith("https://") || v.startsWith("/api/image/")
+}
+
 export function ImageUploader({ name, defaultValue = "" }: Props) {
-  const [tab, setTab] = useState<"upload" | "url">(defaultValue ? "url" : "upload")
-  // savedUrl: 最终写入数据库的值（Blob URL 或外部 URL）
+  const [tab, setTab] = useState<"upload" | "url">(isImageUrl(defaultValue) ? "url" : "upload")
+  // savedUrl: 最终写入数据库的值（代理路径或外部 URL）
   const [savedUrl, setSavedUrl] = useState(defaultValue)
   // previewSrc: 仅用于 <img> 展示
   const [previewSrc, setPreviewSrc] = useState(defaultValue)
-  const [urlInput, setUrlInput] = useState(defaultValue)
+  const [urlInput, setUrlInput] = useState(isImageUrl(defaultValue) ? defaultValue : "")
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState("")
   const [dragging, setDragging] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  // 当编辑现有广告时，defaultValue 存在，此时需要确保已保存的 URL 立即可用
-  const hasDefaultValue = defaultValue && defaultValue.trim().length > 0
-
-  // 当 defaultValue 变化时（比如切换编辑的广告），同步更新所有状态
+  // 当 defaultValue 变化时（例如页面跳转到另一条广告的编辑页），同步所有状态
   useEffect(() => {
-    if (defaultValue && defaultValue.trim().length > 0) {
-      setSavedUrl(defaultValue)
-      setPreviewSrc(defaultValue)
-      setUrlInput(defaultValue)
-      setTab("url")
-    }
+    setSavedUrl(defaultValue)
+    setPreviewSrc(defaultValue)
+    setUrlInput(isImageUrl(defaultValue) ? defaultValue : "")
+    setTab(isImageUrl(defaultValue) ? "url" : "upload")
   }, [defaultValue])
 
   const upload = async (file: File) => {
@@ -172,23 +174,18 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
 
       {/* URL 输入区域 */}
       {tab === "url" && (
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-2">
-            <Input
-              type="url"
-              placeholder="https://example.com/dog.jpg"
-              value={urlInput}
-              onChange={(e) => setUrlInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmUrl() } }}
-              className="font-mono text-xs"
-            />
-            <Button type="button" variant="outline" onClick={confirmUrl} disabled={!urlInput.trim()}>
-              确认
-            </Button>
-          </div>
-          {hasDefaultValue && savedUrl === defaultValue && (
-            <p className="text-xs text-muted-foreground">当前已保存的图片 URL（编辑此字段可更换图片）</p>
-          )}
+        <div className="flex gap-2">
+          <Input
+            type="url"
+            placeholder="https://example.com/dog.jpg"
+            value={urlInput}
+            onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); confirmUrl() } }}
+            className="font-mono text-xs"
+          />
+          <Button type="button" variant="outline" onClick={confirmUrl} disabled={!urlInput.trim()}>
+            确认
+          </Button>
         </div>
       )}
 
