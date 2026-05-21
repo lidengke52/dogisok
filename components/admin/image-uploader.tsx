@@ -46,14 +46,21 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
       const res = await fetch("/api/upload", { method: "POST", body: form })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || "上传失败")
+        throw new Error(data.error || `Upload failed (${res.status})`)
       }
       const { url } = await res.json()
+      if (!url || typeof url !== "string") {
+        throw new Error("Server returned invalid URL")
+      }
       // 上传完成后 savedUrl 改为 Blob 地址（用于保存到数据库）
-      // previewSrc 保持 objectURL 不变，预览继续正常显示
+      // previewSrc 改为真实 URL 以确保持久化显示
       setSavedUrl(url)
+      setPreviewSrc(url)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "上传失败")
+      const msg = err instanceof Error ? err.message : "Upload failed"
+      setError(msg)
+      console.log("[v0] Upload error:", msg)
+      // 上传失败时恢复预览为已保存的 URL
       setPreviewSrc(savedUrl)
     } finally {
       setUploading(false)

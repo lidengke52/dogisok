@@ -85,6 +85,7 @@ export async function deleteProduct(id: string) {
   const { error } = await supabase.from("products").delete().eq("id", id)
   if (error) throw new Error(error.message)
   revalidatePath("/admin/products")
+  revalidatePath("/")
 }
 
 export async function deleteProductsBulk(ids: string[]) {
@@ -93,4 +94,5 @@ export async function deleteProductsBulk(ids: string[]) {
   const { error } = await supabase.from("products").delete().in("id", ids)
   if (error) throw new Error(error.message)
   revalidatePath("/admin/products")
+  revalidatePath("/")
 }
