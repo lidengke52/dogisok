@@ -103,31 +103,33 @@ export function InviteProgress({
   const giftStatusLabel = hasClaim ? "Claim submitted" : giftUnlocked ? "Unlocked!" : "In progress"
 
   return (
-    <section className="rounded-2xl border border-border bg-background p-6 md:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
+    <section className="w-full min-w-0 rounded-2xl border border-border bg-background p-5 md:p-8">
+      {/* 头部：标题 + 状态标签 */}
+      <div className="flex min-w-0 flex-col gap-3">
+        <div className="flex min-w-0 flex-wrap items-start justify-between gap-2">
           <p className="text-xs font-medium uppercase tracking-wider text-primary">Invite &amp; earn</p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight md:text-2xl">
-            Invite 20 friends, get a free pet supplement pack
-          </h2>
-        <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
+          <div className="flex shrink-0 items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+            <Gift className="h-3.5 w-3.5" aria-hidden="true" />
+            {giftStatusLabel}
+          </div>
+        </div>
+        <h2 className="text-xl font-semibold tracking-tight md:text-2xl">
+          Invite 20 friends, get a free pet supplement pack
+        </h2>
+        <p className="text-sm text-muted-foreground">
           Share your code. When 20 friends sign up with verified emails, we ship a free vet-curated supplement pack to
           your US/Canada address.
         </p>
-        </div>
-        <div className="flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-          <Gift className="h-3.5 w-3.5" aria-hidden="true" />
-          {giftStatusLabel}
-        </div>
       </div>
 
-      <div className="mt-6">
-        <div className="flex items-end justify-between">
-          <div>
+      {/* 进度条 */}
+      <div className="mt-6 min-w-0">
+        <div className="flex items-end justify-between gap-2">
+          <div className="min-w-0">
             <span className="text-3xl font-semibold tracking-tight">{totalInvited}</span>
             <span className="text-lg text-muted-foreground"> / {target} friends</span>
           </div>
-          <span className="text-sm font-medium text-muted-foreground">{percent}%</span>
+          <span className="shrink-0 text-sm font-medium text-muted-foreground">{percent}%</span>
         </div>
         <div className="mt-2 h-3 w-full overflow-hidden rounded-full bg-secondary">
           <div
@@ -135,42 +137,45 @@ export function InviteProgress({
             style={{ width: `${percent}%` }}
           />
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">
-          Each friend must sign up with a unique email and verify it to count. {totalAttempted > totalInvited && `(${totalAttempted - totalInvited} pending verification)`}
+        <p className="mt-2 break-words text-xs text-muted-foreground">
+          Each friend must sign up with a unique email and verify it to count.
+          {totalAttempted > totalInvited && ` (${totalAttempted - totalInvited} pending verification)`}
         </p>
       </div>
 
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-border bg-secondary/30 p-4">
+      {/* 邀请码 + 链接 */}
+      <div className="mt-6 grid min-w-0 gap-3 sm:grid-cols-2">
+        <div className="min-w-0 rounded-lg border border-border bg-secondary/30 p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Your invite code</p>
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <span className="font-mono text-xl font-semibold tracking-wider">{inviteCode || "—"}</span>
-            <Button size="sm" variant="ghost" onClick={() => copy(inviteCode, "code")} disabled={!inviteCode}>
+          <div className="mt-2 flex min-w-0 items-center justify-between gap-2">
+            <span className="min-w-0 truncate font-mono text-xl font-semibold tracking-wider">{inviteCode || "—"}</span>
+            <Button size="sm" variant="ghost" onClick={() => copy(inviteCode, "code")} disabled={!inviteCode} className="shrink-0">
               {copiedCode ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               <span className="ml-1.5 text-xs">{copiedCode ? "Copied" : "Copy"}</span>
             </Button>
           </div>
         </div>
 
-        <div className="rounded-lg border border-border bg-secondary/30 p-4">
+        <div className="min-w-0 rounded-lg border border-border bg-secondary/30 p-4">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Invite link</p>
-          <div className="mt-2 flex items-center justify-between gap-2">
-            <span className="truncate text-sm text-muted-foreground">{inviteLink}</span>
-            <Button size="sm" variant="ghost" onClick={() => copy(inviteLink, "link")}>
+          <div className="mt-2 flex min-w-0 items-center justify-between gap-2">
+            <span className="min-w-0 truncate text-sm text-muted-foreground">{inviteLink}</span>
+            <Button size="sm" variant="ghost" onClick={() => copy(inviteLink, "link")} className="shrink-0">
               {copiedLink ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="mt-5">
+      {/* 分享 */}
+      <div className="mt-5 min-w-0">
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Share to</p>
-        <div className="mt-2 flex flex-wrap items-center gap-2">
+        <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
           <Button onClick={nativeShare} className="gap-2">
             <Share2 className="h-4 w-4" />
             Share
           </Button>
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-1">
             {socials.map((s) => {
               const Icon = s.icon
               return (
@@ -189,7 +194,7 @@ export function InviteProgress({
             })}
           </div>
           {giftUnlocked && !hasClaim && (
-            <Button asChild variant="default" className="ml-auto gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
+            <Button asChild variant="default" className="gap-2 bg-accent text-accent-foreground hover:bg-accent/90">
               <Link href="/account/claim-product">
                 <Gift className="h-4 w-4" />
                 Claim free gift
@@ -197,7 +202,7 @@ export function InviteProgress({
             </Button>
           )}
           {hasClaim && (
-            <Button asChild variant="outline" className="ml-auto gap-2">
+            <Button asChild variant="outline" className="gap-2">
               <Link href="/account/claim-product">
                 <Gift className="h-4 w-4" />
                 View claim
