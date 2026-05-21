@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function ImageUploader({ name, defaultValue = "" }: Props) {
-  const [tab, setTab] = useState<"upload" | "url">("upload")
+  const [tab, setTab] = useState<"upload" | "url">(defaultValue ? "url" : "upload")
   // savedUrl: 最终写入数据库的值（Blob URL 或外部 URL）
   const [savedUrl, setSavedUrl] = useState(defaultValue)
   // previewSrc: 仅用于 <img> 展示，本地上传时使用 objectURL 无需代理
@@ -43,19 +43,40 @@ export function ImageUploader({ name, defaultValue = "" }: Props) {
     try {
       const form = new FormData()
       form.append("file", file)
+      console.log("[v0] Starting upload for:", file.name)
       const res = await fetch("/api/upload", { method: "POST", body: form })
+      console.log("[v0] Upload response status:", res.status)
+      
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || `Upload failed (${res.status})`)
+        let errorMsg = `Upload failed (${res.status})`
+        try {
+          const data = await res.json()
+          errorMsg = data.error || errorMsg
+        } catch (e) {
+          const text = await res.text()
+          console.log("[v0] Response body:", text)
+        }
+        throw new Error(errorMsg)
       }
+      
       const { url } = await res.json()
+      console.log("[v0] Received URL:", url)
+      
       if (!url || typeof url !== "string") {
-        throw new Error("Server returned invalid URL")
+        throw new Error("Server returned invalid URL: " + JSON.stringify(url))
       }
-      // 上传完成后 savedUrl 改为 Blob 地址（用于保存到数据库）
-      // previewSrc 改为真实 URL 以确保持久化显示
+      
+      // 验证返回的 URL 是否有效
+      try {
+        new URL(url)
+      } catch {
+        throw new Error("Invalid URL format: " + url)
+      }
+      
+      // 上传完成后保存 URL
       setSavedUrl(url)
       setPreviewSrc(url)
+      console.log("[v0] Upload successful")
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Upload failed"
       setError(msg)

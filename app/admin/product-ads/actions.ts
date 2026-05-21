@@ -101,15 +101,17 @@ export async function updateProductAd(
 
 export async function deleteProductAd(id: string) {
   const supabase = await assertAdmin()
-  await supabase.from("product_ads").delete().eq("id", id)
+  const { error } = await supabase.from("product_ads").delete().eq("id", id)
+  if (error) throw new Error(error.message)
   revalidateAll()
 }
 
 export async function toggleProductAd(id: string, nextState: boolean) {
   const supabase = await assertAdmin()
-  await supabase
+  const { error } = await supabase
     .from("product_ads")
     .update({ is_active: nextState, updated_at: new Date().toISOString() })
     .eq("id", id)
+  if (error) throw new Error(error.message)
   revalidateAll()
 }
