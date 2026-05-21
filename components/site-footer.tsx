@@ -48,23 +48,29 @@ export function SiteFooter() {
             </p>
             <div className="mt-6 flex items-center gap-3">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-[#1877F2]"
               >
                 <Facebook className="h-4 w-4" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-[#E4405F]"
               >
                 <Instagram className="h-4 w-4" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://www.twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 aria-label="Twitter"
-                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-[#1DA1F2]"
               >
                 <Twitter className="h-4 w-4" />
               </a>

@@ -3,7 +3,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { Clock, CalendarDays, Facebook, Twitter, Share2, ArrowLeft } from "lucide-react"
+import { Clock, CalendarDays, Facebook, Twitter, Instagram, Share2, ArrowLeft } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { ArticleCard } from "@/components/article-card"
@@ -105,18 +105,50 @@ export default async function ArticleDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
-                <span className="mr-2 text-xs text-muted-foreground">Share</span>
-                <Button variant="outline" size="icon" aria-label="Share on Facebook">
-                  <Facebook className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" aria-label="Share on Twitter">
-                  <Twitter className="h-4 w-4" />
-                </Button>
-                <Button variant="outline" size="icon" aria-label="Copy link">
-                  <Share2 className="h-4 w-4" />
-                </Button>
-              </div>
+            <div className="flex items-center gap-1.5">
+              <span className="mr-2 text-xs text-muted-foreground">Share</span>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(`https://dogisok.com/articles/${slug}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
+                aria-label="Share on Facebook"
+              >
+                <Facebook className="h-4 w-4" />
+              </a>
+              <a
+                href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://dogisok.com/articles/${slug}`)}&text=${encodeURIComponent(article.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
+                aria-label="Share on Twitter"
+              >
+                <Twitter className="h-4 w-4" />
+              </a>
+              <a
+                href={`https://www.instagram.com/`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-primary"
+                aria-label="Follow on Instagram"
+                title="Follow us on Instagram"
+              >
+                <Instagram className="h-4 w-4" />
+              </a>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => {
+                  const url = `https://dogisok.com/articles/${slug}`
+                  if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url)
+                  }
+                }}
+                aria-label="Copy link"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </div>
             </div>
           </div>
 
