@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Clock } from "lucide-react"
@@ -8,11 +10,19 @@ type ArticleCardProps = {
   variant?: "default" | "compact" | "featured"
 }
 
+const handleArticleClick = () => {
+  // 保存当前滚动位置和点击的文章 slug
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("articles_scroll_y", window.scrollY.toString())
+  }
+}
+
 export function ArticleCard({ article, variant = "default" }: ArticleCardProps) {
   if (variant === "featured") {
     return (
       <Link
         href={`/articles/${article.slug}`}
+        onClick={handleArticleClick}
         className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
       >
         <div className="relative aspect-[16/9] overflow-hidden bg-muted">
@@ -57,6 +67,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
   return (
     <Link
       href={`/articles/${article.slug}`}
+      onClick={handleArticleClick}
       className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
