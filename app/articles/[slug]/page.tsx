@@ -3,13 +3,14 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
-import { Clock, CalendarDays, ArrowLeft } from "lucide-react"
+import { Clock, CalendarDays } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { ArticleCard } from "@/components/article-card"
 import { ProductAdSlot } from "@/components/ads/product-ad-card"
 import { ArticleShareButtons } from "@/components/articles/article-share-buttons"
 import { Button } from "@/components/ui/button"
+import { ArticleBackButton } from "@/components/articles/article-back-button"
 import { getArticleBySlug, listRelated, toCardArticle, listRandomArticles } from "@/lib/articles"
 import { getProductAdsByPlacement } from "@/lib/product-ads"
 
@@ -41,13 +42,7 @@ export default async function ArticleDetailPage({ params }: PageProps) {
       <main className="flex-1">
         <article>
           <div className="mx-auto max-w-3xl px-4 pt-8 md:px-6 md:pt-12 lg:px-8">
-            <Link
-              href="/articles"
-              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to articles
-            </Link>
+            <ArticleBackButton />
 
             <div className="mt-6 flex flex-wrap items-center gap-2">
               <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium capitalize text-primary">

@@ -15,7 +15,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
         href={`/articles/${article.slug}`}
         className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+        <div className="relative aspect-[3/2] overflow-hidden bg-muted">
           {article.image ? (
             <Image
               src={article.image}
@@ -25,10 +25,10 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
               sizes="(min-width: 1024px) 50vw, 100vw"
             />
           ) : (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex h-full flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-6">
               <div className="text-center">
-                <p className="text-sm font-semibold text-muted-foreground">{article.category}</p>
-                <p className="mt-2 max-w-xs text-balance text-sm font-medium text-foreground">{article.title}</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{article.category}</p>
+                <p className="mt-3 text-balance text-base font-semibold text-foreground line-clamp-4">{article.title}</p>
               </div>
             </div>
           )}
