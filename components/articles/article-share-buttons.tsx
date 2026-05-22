@@ -11,7 +11,7 @@ interface ArticleShareButtonsProps {
 
 export function ArticleShareButtons({ slug, title }: ArticleShareButtonsProps) {
   const [copied, setCopied] = useState(false)
-  const url = typeof window !== "undefined" ? window.location.href : `https://dogisok.com/articles/${slug}`
+  const url = `https://dogisok.com/articles/${slug}`
 
   const handleCopyLink = async () => {
     try {
