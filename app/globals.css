@@ -219,19 +219,33 @@
 
 .prose-custom > :has(table) {
   @apply overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0;
+  /* 隐藏滚动条但保留滚动功能 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* 添加右侧渐变阴影，提示可以滚动 */
+  background: linear-gradient(to right, transparent, transparent calc(100% - 20px), rgba(74, 144, 226, 0.1) 100%) !important;
+  background-attachment: local, scroll;
+}
+
+.prose-custom > :has(table)::-webkit-scrollbar {
+  display: none;
 }
 
 .prose-custom table th,
 .prose-custom table td {
-  @apply border border-border px-3 py-2 text-left whitespace-nowrap;
+  @apply border border-border px-3 py-2 text-left whitespace-nowrap text-sm md:text-base;
 }
 
 .prose-custom table th {
-  @apply bg-muted font-semibold;
+  @apply bg-muted font-semibold sticky top-0 z-10;
 }
 
 .prose-custom table tbody tr:nth-child(even) {
   @apply bg-muted/30;
+}
+
+.prose-custom table tbody tr {
+  @apply transition-colors hover:bg-muted/50;
 }
 
 .prose-custom hr {
