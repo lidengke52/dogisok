@@ -2,6 +2,7 @@ import Link from "next/link"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { ArticleCard } from "@/components/article-card"
+import { ArticleScrollRestorer } from "@/components/articles/article-scroll-restorer"
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
 import { FileText } from "lucide-react"
 import { listPublishedArticles, toCardArticle } from "@/lib/articles"
@@ -64,6 +65,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
+      <ArticleScrollRestorer />
 
       <main className="flex-1">
         <section className="border-b border-border bg-secondary/30">

@@ -18,10 +18,10 @@ export function ProductAdCard({ ad, variant = "wide" }: Props) {
         rel="noopener noreferrer sponsored"
         className="group flex flex-col items-stretch overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition hover:border-accent/40 hover:shadow-md md:flex-row"
       >
-        <div className="relative h-44 w-full shrink-0 bg-secondary md:h-auto md:w-56">
+        <div className="relative h-56 w-full shrink-0 bg-secondary sm:h-64 md:h-auto md:w-56">
           {ad.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={ad.image_url || "/placeholder.svg"} alt={ad.title} className="h-full w-full object-cover" />
+            <img src={ad.image_url || "/placeholder.svg"} alt={ad.title} className="h-full w-full object-contain" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <ShoppingBag className="h-12 w-12 text-muted-foreground/50" aria-hidden="true" />

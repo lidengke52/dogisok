@@ -1,3 +1,5 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Clock } from "lucide-react"
@@ -8,14 +10,22 @@ type ArticleCardProps = {
   variant?: "default" | "compact" | "featured"
 }
 
+const handleArticleClick = () => {
+  // 保存当前滚动位置和点击的文章 slug
+  if (typeof window !== "undefined") {
+    sessionStorage.setItem("articles_scroll_y", window.scrollY.toString())
+  }
+}
+
 export function ArticleCard({ article, variant = "default" }: ArticleCardProps) {
   if (variant === "featured") {
     return (
       <Link
         href={`/articles/${article.slug}`}
-        className="group relative block overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
+        onClick={handleArticleClick}
+        className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:shadow-lg"
       >
-        <div className="relative aspect-[16/10] overflow-hidden bg-muted">
+        <div className="relative aspect-[16/9] overflow-hidden bg-muted">
           {article.image ? (
             <Image
               src={article.image}
@@ -25,28 +35,30 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
               sizes="(min-width: 1024px) 50vw, 100vw"
             />
           ) : (
-            <div className="flex h-full items-center justify-center">
+            <div className="flex h-full flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-6">
               <div className="text-center">
-                <p className="text-sm font-semibold text-muted-foreground">{article.category}</p>
-                <p className="mt-2 max-w-xs text-balance text-sm font-medium text-foreground">{article.title}</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{article.category}</p>
+                <p className="mt-3 text-balance text-base font-semibold text-foreground line-clamp-4">{article.title}</p>
               </div>
             </div>
           )}
-          {article.image && <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/10 to-transparent" />}
-          <span className="absolute left-4 top-4 rounded-full bg-background/90 px-3 py-1 text-xs font-medium text-foreground backdrop-blur">
-            {article.category}
-          </span>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 p-6 text-background">
-          <h3 className="text-balance text-xl font-semibold leading-tight md:text-2xl">{article.title}</h3>
-          <p className="mt-2 flex items-center gap-3 text-xs text-background/80">
+        <div className="flex flex-1 flex-col p-5 md:p-6">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              {article.category}
+            </span>
+          </div>
+          <h3 className="mt-3 text-balance text-lg font-semibold leading-snug text-foreground md:text-xl">
+            {article.title}
+          </h3>
+          <div className="mt-auto flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
+            <span>{article.author}</span>
             <span className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5" />
-              {article.readTime} min read
+              {article.readTime} min
             </span>
-            <span>&middot;</span>
-            <span>{article.author}</span>
-          </p>
+          </div>
         </div>
       </Link>
     )
@@ -55,6 +67,7 @@ export function ArticleCard({ article, variant = "default" }: ArticleCardProps) 
   return (
     <Link
       href={`/articles/${article.slug}`}
+      onClick={handleArticleClick}
       className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
