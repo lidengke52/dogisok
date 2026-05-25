@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation"
+import { headers, cookies } from "next/headers"
 import { Sparkles, ShieldCheck, Clock3, MessagesSquare } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
@@ -10,6 +11,18 @@ import { ProductAdSlot } from "@/components/ads/product-ad-card"
 import { getProductAdsByPlacement } from "@/lib/product-ads"
 
 export const dynamic = "force-dynamic"
+
+const TRUSTED_PARTNERS = ["pawsareok.com"]
+
+function isFromTrustedPartner(referer: string | null): boolean {
+  if (!referer) return false
+  try {
+    const host = new URL(referer).hostname.replace(/^www\./, "")
+    return TRUSTED_PARTNERS.some((p) => host === p || host.endsWith(`.${p}`))
+  } catch {
+    return false
+  }
+}
 
 const trustPoints = [
   { icon: Clock3, title: "Seconds, not hours", description: "Dr. Max replies in real time." },
@@ -23,8 +36,28 @@ export default async function ConsultationPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  // 检查来自 pawsareok.com 的 referer，允许免登录访问
+  const headersList = await headers()
+  const cookieStore = await cookies()
+  const referer = headersList.get("referer")
+  const partnerCookie = cookieStore.get("partner_access")?.value
+
+  const isPartnerAccess =
+    isFromTrustedPartner(referer) || partnerCookie === "pawsareok"
+
+  if (!user && !isPartnerAccess) {
     redirect("/login?redirect=/consultation")
+  }
+
+  // 如果是来自合作伙伴的 referer，设置 cookie 保持免登录状态（1小时）
+  if (isFromTrustedPartner(referer) && partnerCookie !== "pawsareok") {
+    const cookieStore2 = await cookies()
+    cookieStore2.set("partner_access", "pawsareok", {
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60,
+      path: "/",
+    })
   }
 
   const [featuredCases, consultationAds] = await Promise.all([
@@ -35,6 +68,13 @@ export default async function ConsultationPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
+
+      {isPartnerAccess && !user && (
+        <div className="border-b border-primary/20 bg-primary/5 px-4 py-2.5 text-center text-sm text-primary">
+          You are accessing Dr. Max via{" "}
+          <span className="font-semibold">pawsareok.com</span> — no account required.
+        </div>
+      )}
 
       <main className="flex-1">
         <section className="relative overflow-hidden border-b border-border">

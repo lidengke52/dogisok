@@ -44,11 +44,12 @@ export function toCardArticle(row: DbArticle): Article {
   }
 }
 
-export async function listPublishedArticles(options?: { category?: string; limit?: number }) {
+export async function listPublishedArticles(options?: { category?: string; limit?: number; offset?: number }) {
   const supabase = await createClient()
   let q = supabase.from("articles").select("*").eq("published", true).order("published_at", { ascending: false })
   if (options?.category && options.category !== "all") q = q.eq("category", options.category)
   if (options?.limit) q = q.limit(options.limit)
+  if (options?.offset) q = q.range(options.offset, options.offset + (options.limit ?? 20) - 1)
   const { data } = await q
   return (data ?? []) as DbArticle[]
 }

@@ -1,9 +1,11 @@
-import { streamText } from "ai"
 import { streamDrMaxResponse } from "@/lib/deepseek"
 import { createClient } from "@/lib/supabase/server"
+import { cookies } from "next/headers"
 import { Message } from "ai"
 
 export const runtime = "nodejs"
+
+const TRUSTED_PARTNER_COOKIE = "pawsareok"
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +26,15 @@ export async function POST(req: Request) {
     const {
       data: { user },
     } = await supabase.auth.getUser()
+
+    // 检查合作伙伴 cookie（pawsareok.com 免登录访问）
+    const cookieStore = await cookies()
+    const partnerCookie = cookieStore.get("partner_access")?.value
+    const isPartnerAccess = partnerCookie === TRUSTED_PARTNER_COOKIE
+
+    if (!user && !isPartnerAccess) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 })
+    }
 
     // 将 messages 转换为 AI SDK 格式的 Message 数组（去掉最后一个用户消息，因为 streamDrMaxResponse 会添加）
     const conversationHistory: Message[] = messages.slice(0, -1).map((msg: any) => ({
