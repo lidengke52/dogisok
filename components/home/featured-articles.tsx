@@ -5,12 +5,10 @@ import { ArticleCard } from "@/components/article-card"
 import { listPublishedArticles, toCardArticle } from "@/lib/articles"
 
 export async function FeaturedArticles() {
-  const rows = await listPublishedArticles({ limit: 5 })
+  const rows = await listPublishedArticles({ limit: 6 })
   const items = rows.map(toCardArticle)
 
   if (items.length === 0) return null
-
-  const [featured, ...rest] = items
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 md:px-6 md:py-20 lg:px-8">
@@ -29,17 +27,10 @@ export async function FeaturedArticles() {
         </Button>
       </div>
 
-      <div className="mt-10 grid gap-5 lg:grid-cols-[1fr_1fr]">
-        {featured && (
-          <div className="self-start">
-            <ArticleCard article={featured} variant="featured" />
-          </div>
-        )}
-        <div className="grid gap-5 sm:grid-cols-2">
-          {rest.slice(0, 4).map((article) => (
-            <ArticleCard key={article.slug} article={article} />
-          ))}
-        </div>
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((article) => (
+          <ArticleCard key={article.slug} article={article} />
+        ))}
       </div>
     </section>
   )
