@@ -21,6 +21,7 @@ import {
   X,
   LogOut,
   Sparkles,
+  SearchCheck,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -71,6 +72,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "系统设置",
     items: [
+      { href: "/admin/seo", label: "SEO & 流量统计", icon: SearchCheck },
       { href: "/admin/ai-config/dr-max", label: "Dr.Max AI 配置", icon: Sparkles },
       { href: "/admin/ai-config/disease-check", label: "疾病自查 AI 配置", icon: ShieldAlert },
     ],
