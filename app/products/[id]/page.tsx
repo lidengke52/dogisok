@@ -127,14 +127,14 @@ export default async function ProductPage({ params }: ProductPageProps) {
                       href={`/products/${relatedProduct.id}`}
                       className="group overflow-hidden rounded-lg bg-secondary transition-shadow hover:shadow-lg"
                     >
-                      <div className="aspect-video overflow-hidden bg-muted">
+                      <div className="flex aspect-square items-center justify-center overflow-hidden bg-muted p-4">
                         {cover && (
                           <Image
                             src={cover}
                             alt={relatedProduct.name}
                             width={300}
-                            height={200}
-                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                            height={300}
+                            className="h-full w-full object-contain transition-transform group-hover:scale-105"
                           />
                         )}
                       </div>
