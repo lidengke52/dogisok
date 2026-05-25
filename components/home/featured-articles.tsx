@@ -29,13 +29,17 @@ export async function FeaturedArticles() {
         </Button>
       </div>
 
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-5 lg:grid-cols-[1fr_1fr]">
         {featured && (
-          <ArticleCard article={featured} variant="featured" />
+          <div className="self-start">
+            <ArticleCard article={featured} variant="featured" />
+          </div>
         )}
-        {rest.slice(0, 4).map((article) => (
-          <ArticleCard key={article.slug} article={article} />
-        ))}
+        <div className="grid gap-5 sm:grid-cols-2">
+          {rest.slice(0, 4).map((article) => (
+            <ArticleCard key={article.slug} article={article} />
+          ))}
+        </div>
       </div>
     </section>
   )
