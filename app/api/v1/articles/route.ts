@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authenticateApiRequest, apiCorsHeaders } from "@/lib/api-auth"
 import { listPublishedArticles } from "@/lib/articles"
+import { getArticleUrl } from "@/lib/site-url"
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: apiCorsHeaders() })
@@ -24,11 +25,11 @@ export async function GET(req: NextRequest) {
     category: a.category,
     tags: a.tags ?? [],
     author: a.author,
-    read_time: a.read_time,
+    read_time: a.read_minutes ?? 5,
     image: a.cover_image ?? null,
     excerpt: a.excerpt ?? null,
     published_at: a.published_at,
-    url: `https://dogisok.com/articles/${a.slug}`,
+    url: getArticleUrl(a.slug),
   }))
 
   return NextResponse.json(

@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { Badge } from "@/components/ui/badge"
+import { SITE_URL } from "@/lib/site-url"
 
 export const metadata = {
   title: "API Documentation — Dog is OK",
@@ -87,7 +88,7 @@ function Endpoint({
 }
 
 export default function ApiDocsPage() {
-  const baseUrl = "https://dogisok.com"
+  const baseUrl = SITE_URL
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -114,7 +115,7 @@ export default function ApiDocsPage() {
               <CodeBlock code={`Authorization: Bearer dik_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`} />
               <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                  Keep your API key secret. Contact us at dogisok.com to request an API key.
+                  Keep your API key secret. Contact us at dogisok.net to request an API key.
                 </p>
               </div>
             </div>
@@ -178,10 +179,10 @@ export default function ApiDocsPage() {
       "tags": ["fruit", "safe"],
       "author": "Dr. Sarah Chen",
       "read_time": 4,
-      "image": "https://dogisok.com/...",
+      "image": "https://www.dogisok.net/...",
       "excerpt": "Blueberries are safe for dogs...",
       "published_at": "2025-01-15T10:00:00Z",
-      "url": "https://dogisok.com/articles/can-dogs-eat-blueberries"
+      "url": "https://www.dogisok.net/articles/can-dogs-eat-blueberries"
     }
   ],
   "pagination": {
@@ -211,9 +212,9 @@ export default function ApiDocsPage() {
     "tags": ["fruit", "safe"],
     "author": "Dr. Sarah Chen",
     "read_time": 4,
-    "image": "https://dogisok.com/...",
+    "image": "https://www.dogisok.net/...",
     "published_at": "2025-01-15T10:00:00Z",
-    "url": "https://dogisok.com/articles/can-dogs-eat-blueberries"
+    "url": "https://www.dogisok.net/articles/can-dogs-eat-blueberries"
   }
 }`}
             />

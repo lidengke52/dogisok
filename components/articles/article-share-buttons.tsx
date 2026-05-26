@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { Facebook, Twitter, Instagram, Share2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { getArticleUrl } from "@/lib/site-url"
 
 interface ArticleShareButtonsProps {
   slug: string
@@ -11,7 +12,7 @@ interface ArticleShareButtonsProps {
 
 export function ArticleShareButtons({ slug, title }: ArticleShareButtonsProps) {
   const [copied, setCopied] = useState(false)
-  const url = `https://dogisok.com/articles/${slug}`
+  const url = getArticleUrl(slug)
 
   const handleCopyLink = async () => {
     try {
