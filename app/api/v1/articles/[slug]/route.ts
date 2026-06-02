@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { authenticateApiRequest, apiCorsHeaders } from "@/lib/api-auth"
 import { getArticleBySlug } from "@/lib/articles"
+import { getArticleUrl } from "@/lib/site-url"
 
 export async function OPTIONS() {
   return new NextResponse(null, { status: 204, headers: apiCorsHeaders() })
@@ -36,7 +37,7 @@ export async function GET(
         read_time: article.read_minutes ?? 5,
         image: article.cover_image ?? null,
         published_at: article.published_at,
-        url: `https://dogisok.com/articles/${article.slug}`,
+        url: getArticleUrl(article.slug),
       },
     },
     { headers: apiCorsHeaders() }

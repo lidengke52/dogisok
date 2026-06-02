@@ -1,6 +1,7 @@
 import "server-only"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
+import { SITE_URL } from "@/lib/site-url"
 
 export type SiteSettings = {
   site_title: string
@@ -20,7 +21,7 @@ const DEFAULTS: SiteSettings = {
   og_image: "",
   ga_measurement_id: "",
   robots_index: "true",
-  canonical_url: "https://dogisok.com",
+  canonical_url: SITE_URL,
 }
 
 /** 公开读取（用于 layout 动态注入，使用 anon 客户端） */

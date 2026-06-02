@@ -102,7 +102,7 @@ export function SeoSettingsForm({ initial }: Props) {
               id="canonical_url"
               name="canonical_url"
               defaultValue={initial.canonical_url}
-              placeholder="https://dogisok.com"
+              placeholder="https://www.dogisok.net"
             />
             <p className="text-xs text-muted-foreground">用于告知搜索引擎网站的权威 URL，防止重复内容问题</p>
           </div>
@@ -123,7 +123,7 @@ export function SeoSettingsForm({ initial }: Props) {
               id="og_image"
               name="og_image"
               defaultValue={initial.og_image}
-              placeholder="https://dogisok.com/og-image.jpg"
+              placeholder="https://www.dogisok.net/og-image.jpg"
             />
             <p className="text-xs text-muted-foreground">推荐尺寸 1200×630px，支持 JPG / PNG</p>
           </div>
